@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="fr" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="apple-touch-icon" href="./icons/icon-192.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Sécurité — Apprendre à se protéger en ligne | Sénégal</title>
+    <meta
+      name="description"
+      content="Sécurité est une plateforme sénégalaise gratuite et pédagogique pour apprendre à protéger ses données personnelles et à rester en sécurité en ligne : guides simples, outils interactifs et vos droits (CDP.sn)."
+    />
+    <meta name="theme-color" content="#0b1020" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Sécurité — Protégez vos données, apprenez la sécurité en ligne" />
+    <meta
+      property="og:description"
+      content="Plateforme gratuite d'éducation à la sécurité numérique pour tous les Sénégalais : guides, quiz, détecteur d'arnaques et vos droits en matière de données personnelles."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem("securite-theme");
+          var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+          var theme = saved || (prefersDark ? "dark" : "light");
+          document.documentElement.setAttribute("data-theme", theme);
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript>
+      <p style="font-family: sans-serif; padding: 24px">
+        Sécurité — Apprendre à se protéger en ligne. Cette plateforme a besoin de
+        JavaScript pour fonctionner.
+      </p>
+    </noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
