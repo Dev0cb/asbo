@@ -53,23 +53,83 @@
   }
 }
 
-@layer components {
-  .card {
-    @apply rounded-2xl border border-[var(--border)] bg-[var(--bg-card)];
-  }
-  .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors;
-  }
-  .btn-primary {
-    @apply btn bg-[var(--color-accent)] text-[#1a1207] hover:bg-[var(--color-accent-strong)];
-  }
-  .btn-ghost {
-    @apply btn border border-[var(--border)] text-[var(--text)] hover:border-[var(--color-accent)] hover:text-[var(--text-heading)];
-  }
-  .chip {
-    @apply inline-flex items-center rounded-full border border-[var(--border)] px-3 py-1 text-xs font-medium text-[var(--text-muted)];
-  }
-  .input {
-    @apply w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2.5 text-sm text-[var(--text-heading)] placeholder:text-[var(--text-muted)] focus:border-[var(--color-accent)] focus:outline-none;
-  }
+/* NOTE: Tailwind v4 does not expand @apply inside @layer — plain CSS only here. */
+.card {
+  border-radius: 1rem;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+}
+
+.btn,
+.btn-primary,
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 0.5rem;
+  padding: 0.625rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.25rem;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+  cursor: pointer;
+  text-decoration: none;
+  border: none;
+  font-family: inherit;
+}
+
+.btn-primary {
+  background: var(--color-accent);
+  color: #1a1207;
+}
+.btn-primary:hover {
+  background: var(--color-accent-strong);
+}
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-ghost {
+  border: 1px solid var(--border);
+  color: var(--text);
+  background: transparent;
+}
+.btn-ghost:hover {
+  border-color: var(--color-accent);
+  color: var(--text-heading);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  border: 1px solid var(--border);
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.input {
+  width: 100%;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  padding: 0.625rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--text-heading);
+  font-family: inherit;
+}
+.input::placeholder {
+  color: var(--text-muted);
+}
+.input:focus {
+  border-color: var(--color-accent);
+  outline: none;
 }
