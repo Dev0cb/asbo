@@ -115,6 +115,8 @@ const App: React.FC = () => {
 
   return (
     <div className="flex min-h-screen flex-col bg-[var(--bg)] text-[var(--text-muted)]">
+      <div className="flag-bar fixed inset-x-0 top-0 z-[60] h-1" aria-hidden="true" />
+      <div className="h-1" aria-hidden="true" />
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-lg focus:bg-[var(--bg-elevated)] focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-[var(--text-heading)]"

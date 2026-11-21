@@ -4,6 +4,19 @@ import { GUIDES, type Guide } from '../data/guides';
 import { track } from '../lib/stats';
 import { navigate } from '../lib/router';
 import { GUIDE_ICONS, IconArrow, IconClock, IconCheck } from './icons';
+import { Reveal } from './Reveal';
+
+const ICON_COLORS: Record<string, string> = {
+  phish: '#f87171',
+  money: '#34d399',
+  key: '#fbbf24',
+  share: '#38bdf8',
+  phone: '#a78bfa',
+  wifi: '#22d3ee',
+  child: '#f472b6',
+  news: '#fb923c',
+  alert: '#f87171',
+};
 
 interface Props {
   lang: Lang;
@@ -73,21 +86,25 @@ const GuidesIndex: React.FC<{ lang: Lang; guides: Guide[] }> = ({ lang, guides }
       {filtered.length === 0 ? (
         <p className="mt-10 text-[var(--text-muted)]">{t.guides.empty}</p>
       ) : (
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((g) => {
+        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {filtered.map((g, i) => {
             const Icon = GUIDE_ICONS[g.icon] || IconCheck;
+            const color = ICON_COLORS[g.icon] || '#f59e0b';
             return (
+              <Reveal key={g.slug} delay={(i % 3) * 80}>
               <a
-                key={g.slug}
                 href={`#/guides/${g.slug}`}
                 onClick={(e) => {
                   e.preventDefault();
                   navigate(`/guides/${g.slug}`);
                 }}
-                className="card group flex flex-col p-5 transition-colors hover:border-[var(--color-accent)]"
+                className="card card-hover group flex h-full flex-col p-6"
               >
-                <div className="flex items-center justify-between">
-                  <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[var(--color-accent)]/10 text-[var(--color-accent)]">
+                <div className="flex items-start justify-between">
+                  <span
+                    className="icon-tile h-12 w-12"
+                    style={{ background: `${color}1a`, color }}
+                  >
                     <Icon className="h-6 w-6" />
                   </span>
                   <span className="chip">
@@ -101,10 +118,12 @@ const GuidesIndex: React.FC<{ lang: Lang; guides: Guide[] }> = ({ lang, guides }
                 <p className="mt-2 line-clamp-3 flex-1 text-sm leading-relaxed text-[var(--text-muted)]">
                   {g.intro}
                 </p>
-                <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-[var(--color-accent)]">
-                  <IconArrow className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--color-accent)]">
+                  {lang === 'fr' ? 'Lire le guide' : 'Read guide'}
+                  <IconArrow className="h-4 w-4 transition-transform group-hover:translate-x-1.5" />
                 </span>
               </a>
+              </Reveal>
             );
           })}
         </div>
@@ -155,7 +174,10 @@ const GuideArticle: React.FC<{ lang: Lang; guide: Guide; guides: Guide[] }> = ({
           </span>
         </div>
         <div className="mt-4 flex items-start gap-4">
-          <span className="hidden h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[var(--color-accent)]/10 text-[var(--color-accent)] sm:flex">
+          <span
+            className="icon-tile hidden h-14 w-14 shrink-0 sm:flex"
+            style={{ background: `${ICON_COLORS[guide.icon] || '#f59e0b'}1a`, color: ICON_COLORS[guide.icon] || '#f59e0b' }}
+          >
             <Icon className="h-8 w-8" />
           </span>
           <h1 className="text-3xl font-extrabold leading-tight tracking-tight text-[var(--text-heading)] sm:text-4xl">
