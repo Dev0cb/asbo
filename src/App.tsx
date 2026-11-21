@@ -46,9 +46,10 @@ const App: React.FC = () => {
   const [route, setRoute] = useState<Route>(parseHash());
 
   useEffect(() => {
+    // Dark-first: the platform's impact relies on the rich dark theme.
+    // A saved user choice still wins.
     const savedTheme = localStorage.getItem('securite-theme') as 'dark' | 'light' | null;
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const initial = savedTheme || (prefersDark ? 'dark' : 'light');
+    const initial = savedTheme || 'dark';
     setTheme(initial);
     document.documentElement.setAttribute('data-theme', initial);
   }, []);

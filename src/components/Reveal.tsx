@@ -10,19 +10,32 @@ export const Reveal: React.FC<{
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+    let done = false;
+    const show = () => {
+      if (!done) {
+        done = true;
+        el.classList.add('is-visible');
+      }
+    };
+    // Safety net: never leave content invisible if IO is slow or unsupported.
+    const timer = window.setTimeout(show, 1200);
     const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
           if (e.isIntersecting) {
-            el.classList.add('is-visible');
+            show();
             io.disconnect();
+            window.clearTimeout(timer);
           }
         });
       },
-      { threshold: 0.12 },
+      { threshold: 0.05, rootMargin: '0px 0px -20px 0px' },
     );
     io.observe(el);
-    return () => io.disconnect();
+    return () => {
+      io.disconnect();
+      window.clearTimeout(timer);
+    };
   }, []);
 
   return (
