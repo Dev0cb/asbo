@@ -8,6 +8,7 @@ export type EventType =
   | 'quiz_complete'
   | 'checker_use'
   | 'checklist_update'
+  | 'lab_complete'
   | 'outbound_click';
 
 // The Supabase SDK is lazy-loaded so the main bundle stays small for

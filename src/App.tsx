@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { Suspense, lazy, useCallback, useEffect, useState } from 'react';
 import { STR, type Lang } from './i18n';
 import { parseHash, type Route } from './lib/router';
 import { track } from './lib/stats';
@@ -6,10 +6,13 @@ import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { Home } from './components/Home';
 import { GuidesPage } from './components/GuidesPage';
-import { ToolsPage } from './components/ToolsPage';
 import { RightsPage } from './components/RightsPage';
 import { AboutPage } from './components/AboutPage';
-import { AdminPage } from './components/AdminPage';
+
+// Heavier, interactive pages are split out so the first load stays small
+// on low-end phones and slow connections.
+const ToolsPage = lazy(() => import('./components/ToolsPage').then((m) => ({ default: m.ToolsPage })));
+const AdminPage = lazy(() => import('./components/AdminPage').then((m) => ({ default: m.AdminPage })));
 
 const STORAGE_LANG = 'securite-lang';
 
@@ -103,7 +106,7 @@ const App: React.FC = () => {
   if (seg === 'guides') {
     page = <GuidesPage lang={lang} slug={sub} />;
   } else if (seg === 'outils') {
-    page = <ToolsPage lang={lang} />;
+    page = <ToolsPage lang={lang} slug={sub} />;
   } else if (seg === 'droits') {
     page = <RightsPage lang={lang} />;
   } else if (seg === 'auteur') {
@@ -132,7 +135,7 @@ const App: React.FC = () => {
         route={route.path}
       />
       <main id="main" className="flex-1">
-        {page}
+        <Suspense fallback={<div className="min-h-[60vh]" aria-busy="true" />}>{page}</Suspense>
       </main>
       <Footer lang={lang} />
     </div>

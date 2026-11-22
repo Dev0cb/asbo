@@ -16,5 +16,10 @@ ReactDOM.createRoot(rootElement).render(
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js').catch(() => {});
+    // Warm the lazily-loaded Tools chunk once idle so the SW caches it and
+    // the tools keep working offline even if never opened online.
+    const warm = () => import('./components/ToolsPage').catch(() => {});
+    if ('requestIdleCallback' in window) window.requestIdleCallback(warm, { timeout: 5000 });
+    else setTimeout(warm, 3000);
   });
 }

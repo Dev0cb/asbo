@@ -23,6 +23,7 @@ const TYPE_COLORS: Record<string, string> = {
   quiz_complete: 'var(--good)',
   checker_use: '#c084fc',
   checklist_update: '#fbbf24',
+  lab_complete: '#f472b6',
   outbound_click: 'var(--text-muted)',
 };
 

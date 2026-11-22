@@ -25,7 +25,7 @@ working in `platform/` and pushing to the `securite` remote.
 - PWA: `public/manifest.webmanifest`, `public/sw.js` (hand-rolled service
   worker, cache name `securite-vN` — bump on every release)
 - Supabase (`@supabase/supabase-js`, **lazy-loaded** via dynamic import so the
-  main bundle stays ~105 kB gzip for low-end devices / slow connections)
+  main bundle stays ~100 kB gzip; Tools/Admin pages are `React.lazy` chunks, Tools is prefetched on idle so it works offline for low-end devices / slow connections)
 - Bilingual FR/EN, **dark theme by default** (light theme still available)
 
 ## Commands
@@ -76,16 +76,19 @@ platform/
 │   ├── config.ts           # env vars, AUTHOR info, PLATFORM_URL
 │   ├── index.css           # design system (plain CSS, see gotcha above)
 │   ├── data/guides.ts      # 9 guides × FR/EN (structured sections)
+│   ├── data/labs.ts        # lab content + lab UI strings + quiz explanations
 │   ├── lib/
 │   │   ├── router.ts       # parseHash/navigate helpers
 │   │   ├── session.ts      # anonymous session UUID (localStorage)
 │   │   ├── stats.ts        # track() → Supabase + localStorage mirror
-│   │   └── scamCheck.ts    # heuristic scam-message analyser (client-side)
+│   │   ├── scamCheck.ts    # heuristic scam-message analyser (client-side)
+│   │   └── password.ts     # password crack-time estimator + CSPRNG passphrase
 │   └── components/
 │       ├── Header/Footer   # nav, lang/theme toggles, PWA install btn
 │       ├── Home.tsx        # hero (aurora bg), scam ticker, sections
 │       ├── GuidesPage.tsx  # index (search) + article (prev/next/related)
-│       ├── ToolsPage.tsx   # quiz / scam checker / checklist tabs
+│       ├── ToolsPage.tsx   # 6 tool tabs (lazy-loaded chunk), quiz w/ explanations
+│       ├── tools/          # PhishingTrainer, PasswordTester, FootprintLab
 │       ├── RightsPage.tsx  # Senegal law 2008-12 + CDP contact card
 │       ├── AboutPage.tsx   # author card → malickba.me / LinkedIn / GitHub
 │       ├── AdminPage.tsx   # Supabase auth dashboard + demo fallback
@@ -99,7 +102,7 @@ platform/
 ## Routes (hash-based)
 
 `#/` home · `#/guides` index · `#/guides/<slug>` article · `#/outils`
-(tools) · `#/droits` (data rights/CDP) · `#/auteur` (author) · `#/admin`
+(tools; deep links `#/outils/quiz|vrai-ou-arnaque|detecteur|mot-de-passe|vos-donnees|checklist`) · `#/droits` (data rights/CDP) · `#/auteur` (author) · `#/admin`
 (dashboard). Guide slugs (same in FR/EN): `hameconnage`, `mobile-money`,
 `mots-de-passe`, `reseaux-sociaux`, `telephone-appareil`, `wifi-public`,
 `enfants-en-ligne`, `infox-faux-profils`, `que-faire-urgence`.
@@ -161,6 +164,25 @@ platform/
   desktop (1366px) and look at the screenshots.
 - Analytics: `page_view` is tracked ONLY in `App.tsx` (on hash change). Do
   not add per-page `track('page_view')` effects — that double-counted.
+
+## Labs (Tools page)
+
+Adapted from the owner's "Cyber-Enquêteur Academy" project
+(`~/Téléchargements/cyber-enquêteur-academy`, Next.js/AI Studio), rewritten
+for Senegal and the Sécurité design system:
+- **Vrai ou arnaque ?** (`PhishingTrainer`) ← its "Détecteur de phishing":
+  8 SMS/WhatsApp/e-mail scenarios, clues + explanation after each answer.
+- **Mot de passe** (`PasswordTester` + `lib/password.ts`) ← "Craquage de mots
+  de passe", but with a real guesses-based estimate (common/Senegalese words,
+  word+digits, compound words, sequences) at 1e10 guesses/s. The typed value
+  is NEVER tracked/stored/sent. Passphrases use `crypto.getRandomValues`.
+- **Vos données parlent** (`FootprintLab`) ← "Vos données parlent" (OSINT):
+  4 "Facebook quiz" answers → guessable passwords, secret-question answers,
+  tailored scam message.
+- **Quiz explanations** (`QUIZ_WHY`) ← "Sécurité des comptes": feedback +
+  "why" after each answer. Keep `QUIZ_WHY` in the same order as `QUIZ`.
+- Event `lab_complete` `{lab, score?, max?, lang}` (no DB constraint on type).
+- Lab strings live in `data/labs.ts` (`LAB_STR`) to keep `i18n.ts` < 800 lines.
 
 ## Roadmap ideas (discussed with owner)
 

@@ -1,22 +1,56 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { STR, QUIZ, CHECKLIST, quizResult, type Lang } from '../i18n';
+import { LAB_STR, QUIZ_WHY } from '../data/labs';
 import { analyzeMessage, type Analysis } from '../lib/scamCheck';
 import { track } from '../lib/stats';
 import { IconCheck, IconAlert, IconArrow } from './icons';
+import { PhishingTrainer } from './tools/PhishingTrainer';
+import { PasswordTester } from './tools/PasswordTester';
+import { FootprintLab } from './tools/FootprintLab';
 
 interface Props {
   lang: Lang;
+  slug?: string;
 }
 
-type Tab = 'quiz' | 'checker' | 'checklist';
+// URL slug for each tool, e.g. #/outils/mot-de-passe (shareable links).
+const TOOL_SLUGS = {
+  quiz: 'quiz',
+  phishing: 'vrai-ou-arnaque',
+  checker: 'detecteur',
+  password: 'mot-de-passe',
+  footprint: 'vos-donnees',
+  checklist: 'checklist',
+} as const;
 
-export const ToolsPage: React.FC<Props> = ({ lang }) => {
+type Tab = keyof typeof TOOL_SLUGS;
+
+function tabFromSlug(slug?: string): Tab {
+  const found = (Object.keys(TOOL_SLUGS) as Tab[]).find((k) => TOOL_SLUGS[k] === slug);
+  return found ?? 'quiz';
+}
+
+export const ToolsPage: React.FC<Props> = ({ lang, slug }) => {
   const t = STR[lang];
-  const [tab, setTab] = useState<Tab>('quiz');
+  const [tab, setTab] = useState<Tab>(() => tabFromSlug(slug));
+
+  // Follow external navigation (e.g. a link to #/outils/mot-de-passe).
+  useEffect(() => {
+    setTab(tabFromSlug(slug));
+  }, [slug]);
+
+  const selectTab = (id: Tab) => {
+    setTab(id);
+    // Update the URL without triggering a hashchange (no scroll jump).
+    history.replaceState(null, '', `#/outils/${TOOL_SLUGS[id]}`);
+  };
 
   const tabs: { id: Tab; label: string }[] = [
     { id: 'quiz', label: t.tools.quizTab },
+    { id: 'phishing', label: t.tools.phishTab },
     { id: 'checker', label: t.tools.checkerTab },
+    { id: 'password', label: t.tools.pwTab },
+    { id: 'footprint', label: t.tools.fpTab },
     { id: 'checklist', label: t.tools.checkTab },
   ];
 
@@ -27,14 +61,14 @@ export const ToolsPage: React.FC<Props> = ({ lang }) => {
       </h1>
       <p className="mt-3 max-w-2xl text-[var(--text-muted)]">{t.tools.intro}</p>
 
-      <div className="mt-6 grid grid-cols-3 gap-2 sm:flex" role="tablist">
+      <div className="mt-6 grid grid-cols-3 gap-2 sm:grid-cols-6" role="tablist">
         {tabs.map((tb) => (
           <button
             key={tb.id}
             role="tab"
             aria-selected={tab === tb.id}
-            onClick={() => setTab(tb.id)}
-            className={`rounded-lg px-2 py-2.5 text-center text-xs font-medium leading-tight transition-colors sm:whitespace-nowrap sm:px-4 sm:text-sm ${
+            onClick={() => selectTab(tb.id)}
+            className={`rounded-lg px-2 py-2.5 text-center text-xs font-medium leading-tight transition-colors sm:px-2 sm:text-sm ${
               tab === tb.id
                 ? 'bg-[var(--color-accent)] text-[#1a1207]'
                 : 'border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-heading)]'
@@ -47,7 +81,10 @@ export const ToolsPage: React.FC<Props> = ({ lang }) => {
 
       <div className="mt-6">
         {tab === 'quiz' && <Quiz lang={lang} />}
+        {tab === 'phishing' && <PhishingTrainer lang={lang} />}
         {tab === 'checker' && <Checker lang={lang} />}
+        {tab === 'password' && <PasswordTester lang={lang} />}
+        {tab === 'footprint' && <FootprintLab lang={lang} />}
         {tab === 'checklist' && <Checklist lang={lang} />}
       </div>
     </div>
@@ -68,19 +105,23 @@ const Quiz: React.FC<{ lang: Lang }> = ({ lang }) => {
     [answers, questions],
   );
 
+  const answered = answers[idx] !== undefined;
+
+  // Pick an option: show feedback + explanation, wait for "Next".
   const answer = (optIdx: number) => {
+    if (answered) return;
     const next = [...answers];
     next[idx] = optIdx;
     setAnswers(next);
-    setTimeout(() => {
-      if (idx + 1 >= questions.length) {
-        setDone(true);
-        const s = next.reduce((sum, a, i) => sum + (questions[i]?.options[a]?.score ?? 0), 0);
-        track('quiz_complete', { score: s, max: questions.length * 2, lang });
-      } else {
-        setIdx(idx + 1);
-      }
-    }, 250);
+  };
+
+  const goNext = () => {
+    if (idx + 1 >= questions.length) {
+      setDone(true);
+      track('quiz_complete', { score, max: questions.length * 2, lang });
+    } else {
+      setIdx(idx + 1);
+    }
   };
 
   const restart = () => {
@@ -145,20 +186,50 @@ const Quiz: React.FC<{ lang: Lang }> = ({ lang }) => {
         {q.q}
       </h2>
       <div className="mt-6 space-y-3">
-        {q.options.map((o, i) => (
-          <button
-            key={i}
-            onClick={() => answer(i)}
-            className={`w-full rounded-xl border p-4 text-left text-sm leading-relaxed transition-all ${
-              answers[idx] === i
-                ? 'border-[var(--color-accent)] bg-[var(--color-accent)]/10 text-[var(--text-heading)]'
-                : 'border-[var(--border)] text-[var(--text)] hover:border-[var(--color-accent)] hover:bg-[var(--bg-elevated)]'
-            }`}
-          >
-            {o.text}
-          </button>
-        ))}
+        {q.options.map((o, i) => {
+          const picked = answers[idx] === i;
+          const isBest = o.score === 2;
+          let style = 'border-[var(--border)] text-[var(--text)] hover:border-[var(--color-accent)] hover:bg-[var(--bg-elevated)]';
+          if (answered && isBest) style = 'border-[var(--good)] bg-[var(--good)]/10 text-[var(--text-heading)]';
+          else if (answered && picked) style = 'border-[var(--bad)] bg-[var(--bad)]/10 text-[var(--text-heading)]';
+          else if (answered) style = 'border-[var(--border)] text-[var(--text-muted)] opacity-60';
+          return (
+            <button
+              key={i}
+              onClick={() => answer(i)}
+              disabled={answered}
+              className={`flex w-full items-start gap-3 rounded-xl border p-4 text-left text-sm leading-relaxed transition-all ${style}`}
+            >
+              <span className="flex-1">{o.text}</span>
+              {answered && isBest && <IconCheck className="h-5 w-5 shrink-0 text-[var(--good)]" />}
+              {answered && picked && !isBest && <IconAlert className="h-5 w-5 shrink-0 text-[var(--bad)]" />}
+            </button>
+          );
+        })}
       </div>
+      {answered && <QuizFeedback lang={lang} score={q.options[answers[idx]].score} why={QUIZ_WHY[lang][idx]} last={idx + 1 >= questions.length} onNext={goNext} />}
+    </div>
+  );
+};
+
+const QuizFeedback: React.FC<{
+  lang: Lang;
+  score: number;
+  why?: string;
+  last: boolean;
+  onNext: () => void;
+}> = ({ lang, score, why, last, onNext }) => {
+  const s = LAB_STR[lang];
+  const verdict = score === 2 ? s.quizGood : score === 1 ? s.quizPartial : s.quizBad;
+  const color = score === 2 ? 'var(--good)' : score === 1 ? 'var(--warn)' : 'var(--bad)';
+  return (
+    <div className="mt-5 rounded-xl border border-[var(--border)] bg-[var(--bg)] p-4" aria-live="polite">
+      <p className="font-bold" style={{ color }}>{verdict}</p>
+      {why && <p className="mt-2 text-sm leading-relaxed text-[var(--text-muted)]">{why}</p>}
+      <button onClick={onNext} className="btn-primary mt-4">
+        {last ? s.quizSeeResult : s.quizNext}
+        <IconArrow className="h-4 w-4" />
+      </button>
     </div>
   );
 };

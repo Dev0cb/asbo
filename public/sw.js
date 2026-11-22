@@ -1,5 +1,5 @@
 // Sécurité service worker — offline-first for the app shell, network-first for pages.
-const CACHE = 'securite-v5';
+const CACHE = 'securite-v6';
 const PRECACHE = ['./', './index.html', './manifest.webmanifest', './favicon.svg'];
 
 self.addEventListener('install', (event) => {
