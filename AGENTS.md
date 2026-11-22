@@ -96,7 +96,7 @@ platform/
 │       └── icons.tsx       # SVG icon set + GUIDE_ICONS map
 └── supabase/
     ├── schema.sql          # canonical schema (events table + RLS + view)
-    └── migrations/0001_init.sql
+    └── migrations/          # 0001 init · 0002 + 0003 access hardening
 ```
 
 ## Routes (hash-based)
@@ -184,8 +184,10 @@ platform/
   (`securite-local-events`) for the admin demo mode.
 - **Admin account**: the owner's Supabase Auth email/password account (never
   write the email in this public repo). Reads of `events` are restricted to
-  users listed in `public.admins` via `public.is_admin()` (migration 0002);
-  `daily_stats` is `security_invoker`. Public sign-up is enabled in Auth but
+  users listed in `public.admins` (plain RLS, migrations 0002 + 0003; no
+  SECURITY DEFINER function); `daily_stats` is `security_invoker`; anonymous
+  inserts are limited to known event types and 2 KB payloads. Supabase
+  advisors: clean except "leaked password protection" (dashboard setting). Public sign-up is enabled in Auth but
   grants no read access. Add an admin: `insert into public.admins (user_id)
   values ('<auth uid>');` in the SQL editor.
 - Admin dashboard `/#/admin`: without env vars it shows **local demo stats**;
