@@ -407,7 +407,7 @@ const SupabaseDashboard: React.FC<{ lang: Lang }> = ({ lang }) => {
       <div className="mx-auto flex min-h-[60vh] max-w-md items-center px-4">
         <form onSubmit={login} className="card w-full p-6 sm:p-8">
           <div className="flex items-center gap-3">
-            <IconLock className="h-7 w-7 text-[var(--color-accent)]" />
+            <IconLock className="h-7 w-7 text-[var(--accent-text)]" />
             <h1 className="text-xl font-extrabold text-[var(--text-heading)]">{t.admin.loginTitle}</h1>
           </div>
           <p className="mt-2 text-sm text-[var(--text-muted)]">{t.admin.loginSub}</p>

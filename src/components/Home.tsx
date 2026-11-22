@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { STR, type Lang } from '../i18n';
 import { GUIDES } from '../data/guides';
 import { track } from '../lib/stats';
@@ -12,6 +12,7 @@ import {
   IconExternal,
   IconAlert,
   GUIDE_ICONS,
+  FlagSN,
 } from './icons';
 import { Reveal } from './Reveal';
 import { AUTHOR } from '../config';
@@ -39,6 +40,9 @@ export const Home: React.FC<Props> = ({ lang }) => {
   const t = STR[lang];
 
   const guides = GUIDES[lang];
+  // Moving content must be pausable (WCAG 2.2.2): tap toggles it,
+  // keyboard focus and hover pause it (see .ticker in index.css).
+  const [tickerPaused, setTickerPaused] = useState(false);
 
   return (
     <div className="mx-auto max-w-6xl px-4 sm:px-6">
@@ -48,11 +52,14 @@ export const Home: React.FC<Props> = ({ lang }) => {
         <div className="relative">
           <Reveal>
             <div className="flex flex-wrap items-center gap-3">
-              <span className="chip border-[var(--color-accent)]/50 text-[var(--color-accent)]">
+              <span className="chip border-[var(--color-accent)]/50 text-[var(--accent-text)]">
                 <span className="pulse-dot mr-1.5 inline-block h-2 w-2 rounded-full bg-[var(--color-accent)]" />
                 {t.home.badge}
               </span>
-              <span className="chip">🇸🇳 {t.home.madeIn}</span>
+              <span className="chip gap-1.5">
+                <FlagSN className="h-3 w-[18px] rounded-[2px]" />
+                {t.home.madeIn}
+              </span>
             </div>
           </Reveal>
           <Reveal delay={80}>
@@ -125,10 +132,20 @@ export const Home: React.FC<Props> = ({ lang }) => {
             <IconAlert className="h-4 w-4" />
             <span className="hidden sm:inline">{t.home.tickerLabel}</span>
           </span>
-          <div className="ticker flex-1">
+          <div
+            className={`ticker flex-1 ${tickerPaused ? 'is-paused' : ''}`}
+            role="region"
+            tabIndex={0}
+            aria-label={t.home.tickerLabel}
+            onClick={() => setTickerPaused((v) => !v)}
+          >
             <div className="ticker-track">
               {[...t.home.ticker, ...t.home.ticker].map((item, i) => (
-                <span key={i} className="flex items-center gap-2 whitespace-nowrap text-sm text-[var(--text-muted)]">
+                <span
+                  key={i}
+                  aria-hidden={i >= t.home.ticker.length}
+                  className="flex items-center gap-2 whitespace-nowrap text-sm text-[var(--text-muted)]"
+                >
                   <span className="h-1.5 w-1.5 rounded-full bg-[var(--bad)]" />
                   {item}
                 </span>
@@ -150,7 +167,7 @@ export const Home: React.FC<Props> = ({ lang }) => {
             <Reveal key={k} delay={i * 100}>
               <div className="card card-hover h-full p-6">
                 <div className="flex items-center gap-3">
-                  <span className="font-mono text-3xl font-bold text-[var(--color-accent)]/30">
+                  <span className="font-mono text-3xl font-bold text-[var(--accent-text)]/30">
                     {String(i + 1).padStart(2, '0')}
                   </span>
                   <h3 className="font-bold leading-snug text-[var(--text-heading)]">
@@ -211,13 +228,13 @@ export const Home: React.FC<Props> = ({ lang }) => {
                     </span>
                     <span className="chip">{g.minutes} min</span>
                   </div>
-                  <h3 className="mt-4 font-bold leading-snug text-[var(--text-heading)] transition-colors group-hover:text-[var(--color-accent)]">
+                  <h3 className="mt-4 font-bold leading-snug text-[var(--text-heading)] transition-colors group-hover:text-[var(--accent-text)]">
                     {g.title}
                   </h3>
                   <p className="mt-2 line-clamp-2 flex-1 text-sm leading-relaxed text-[var(--text-muted)]">
                     {g.intro}
                   </p>
-                  <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--color-accent)]">
+                  <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--accent-text)]">
                     {t.home.readGuide}
                     <IconArrow className="h-4 w-4 transition-transform group-hover:translate-x-1.5" />
                   </span>
@@ -308,7 +325,7 @@ export const Home: React.FC<Props> = ({ lang }) => {
             <div className="flag-bar" />
             <div className="flex flex-col gap-6 p-7 sm:flex-row sm:items-center sm:justify-between sm:p-10">
               <div className="max-w-2xl">
-                <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[var(--color-accent)]">
+                <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[var(--accent-text)]">
                   {t.home.authorTitle}
                 </p>
                 <p className="mt-3 leading-relaxed text-[var(--text-muted)]">{t.home.authorText}</p>

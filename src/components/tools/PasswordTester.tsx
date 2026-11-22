@@ -4,7 +4,9 @@ import { LAB_STR, PASSPHRASE_WORDS } from '../../data/labs';
 import { analyzePassword, generatePassphrase, humanTime, type FindingKey } from '../../lib/password';
 import { IconAlert, IconCheck, IconEye, IconKey, IconLock } from '../icons';
 
+// Bar colours can be decorative hues; text uses theme tokens that meet 4.5:1.
 const LEVEL_COLORS = ['var(--bad)', '#fb923c', 'var(--warn)', '#a3e635', 'var(--good)'];
+const LEVEL_TEXT = ['var(--bad)', 'var(--bad)', 'var(--warn)', 'var(--good)', 'var(--good)'];
 const POSITIVE: FindingKey[] = ['passphrase'];
 
 /**
@@ -20,6 +22,7 @@ export const PasswordTester: React.FC<{ lang: Lang }> = ({ lang }) => {
   const report = useMemo(() => analyzePassword(pw), [pw]);
   const time = humanTime(report.seconds);
   const color = LEVEL_COLORS[report.level];
+  const textColor = LEVEL_TEXT[report.level];
   const timeLabel =
     time.unit === 'instant' || time.unit === 'centuries'
       ? s.units[time.unit]
@@ -48,7 +51,7 @@ export const PasswordTester: React.FC<{ lang: Lang }> = ({ lang }) => {
           <button
             type="button"
             onClick={() => setVisible((v) => !v)}
-            className="absolute inset-y-1.5 right-1.5 flex items-center gap-1.5 rounded-lg px-3 text-xs font-medium text-[var(--text-muted)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-heading)]"
+            className="absolute inset-y-0 right-0 flex min-w-11 items-center gap-1.5 rounded-r-xl px-4 text-xs font-medium text-[var(--text-muted)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-heading)]"
             aria-pressed={visible}
           >
             <IconEye className="h-4 w-4" />
@@ -71,9 +74,9 @@ export const PasswordTester: React.FC<{ lang: Lang }> = ({ lang }) => {
             <div className="mt-4 flex flex-wrap items-end justify-between gap-3">
               <div>
                 <p className="text-xs uppercase tracking-wider text-[var(--text-muted)]">{s.time}</p>
-                <p className="text-3xl font-extrabold" style={{ color }}>{timeLabel}</p>
+                <p className="text-3xl font-extrabold" style={{ color: textColor }}>{timeLabel}</p>
               </div>
-              <span className="chip" style={{ color, borderColor: color }}>
+              <span className="chip" style={{ color: textColor, borderColor: textColor }}>
                 {s.levels[report.level]}
               </span>
             </div>
@@ -104,7 +107,7 @@ export const PasswordTester: React.FC<{ lang: Lang }> = ({ lang }) => {
 
       <div className="card p-5 sm:p-6">
         <div className="flex items-start gap-3">
-          <span className="icon-tile h-10 w-10 bg-[var(--color-accent)]/10 text-[var(--color-accent)]">
+          <span className="icon-tile h-10 w-10 bg-[var(--color-accent)]/10 text-[var(--accent-text)]">
             <IconKey className="h-5 w-5" />
           </span>
           <div>
@@ -132,7 +135,7 @@ export const PasswordTester: React.FC<{ lang: Lang }> = ({ lang }) => {
       <ul className="card space-y-2.5 p-5 sm:p-6">
         {s.tips.map((tip) => (
           <li key={tip} className="flex gap-3 text-sm leading-relaxed text-[var(--text)]">
-            <IconLock className="mt-0.5 h-4 w-4 shrink-0 text-[var(--color-accent)]" />
+            <IconLock className="mt-0.5 h-4 w-4 shrink-0 text-[var(--accent-text)]" />
             {tip}
           </li>
         ))}

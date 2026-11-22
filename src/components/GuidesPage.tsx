@@ -108,13 +108,13 @@ const GuidesIndex: React.FC<{ lang: Lang; guides: Guide[] }> = ({ lang, guides }
                     {g.minutes} {t.ui.minutes}
                   </span>
                 </div>
-                <h2 className="mt-4 font-semibold leading-snug text-[var(--text-heading)] group-hover:text-[var(--color-accent)]">
+                <h2 className="mt-4 font-semibold leading-snug text-[var(--text-heading)] group-hover:text-[var(--accent-text)]">
                   {g.title}
                 </h2>
                 <p className="mt-2 line-clamp-3 flex-1 text-sm leading-relaxed text-[var(--text-muted)]">
                   {g.intro}
                 </p>
-                <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--color-accent)]">
+                <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--accent-text)]">
                   {t.home.readGuide}
                   <IconArrow className="h-4 w-4 transition-transform group-hover:translate-x-1.5" />
                 </span>
@@ -160,7 +160,7 @@ const GuideArticle: React.FC<{ lang: Lang; guide: Guide; guides: Guide[] }> = ({
           e.preventDefault();
           navigate('/guides');
         }}
-        className="text-sm text-[var(--text-muted)] hover:text-[var(--color-accent)]"
+        className="-ml-1 inline-flex min-h-11 items-center px-1 text-sm text-[var(--text-muted)] hover:text-[var(--accent-text)]"
       >
         ← {t.guides.back}
       </a>
@@ -256,7 +256,7 @@ const GuideArticle: React.FC<{ lang: Lang; guide: Guide; guides: Guide[] }> = ({
                 }}
                 className="card flex items-center gap-3 p-4 text-sm transition-colors hover:border-[var(--color-accent)]"
               >
-                <RI className="h-5 w-5 shrink-0 text-[var(--color-accent)]" />
+                <RI className="h-5 w-5 shrink-0 text-[var(--accent-text)]" />
                 <span className="line-clamp-2 font-medium text-[var(--text-heading)]">{g.title}</span>
               </a>
             );

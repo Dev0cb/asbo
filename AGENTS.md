@@ -107,6 +107,20 @@ platform/
 `mots-de-passe`, `reseaux-sociaux`, `telephone-appareil`, `wifi-public`,
 `enfants-en-ligne`, `infox-faux-profils`, `que-faire-urgence`.
 
+## UI/UX rules (enforced by the 2026-11-22 audit)
+
+- Touch targets ≥ 44px: `.btn*`, `.input`, `a.chip` have `min-height: 2.75rem`;
+  icon buttons use `h-11 w-11`; footer/back links use `min-h-11`.
+- Inputs are 16px (`.input`) — smaller makes iOS Safari zoom on focus.
+- Colours: never use `--color-accent`, raw hex or decorative hues as TEXT.
+  Use `text-[var(--accent-text)]`, `--good`, `--bad`, `--warn`, which are
+  redefined darker in the light theme to meet 4.5:1. `--color-accent` is for
+  backgrounds/borders (e.g. `.btn-primary` gradient with dark text).
+- No emoji as UI icons (flag emoji shows "SN" on Windows) — use SVG (`FlagSN`).
+- Moving content must be pausable: the scam ticker pauses on hover, focus and tap.
+- Audit method: headless Chrome via CDP, every route × dark/light at 390px,
+  checking target size, font size, input font size and WCAG contrast.
+
 ## Content conventions
 
 - **All user-facing text lives in `src/i18n.ts`** (`STR.fr` / `STR.en`) —

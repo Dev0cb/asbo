@@ -186,3 +186,13 @@ export const GUIDE_ICONS: Record<string, React.FC<React.SVGProps<SVGSVGElement>>
   news: IconNews,
   alert: IconAlert,
 };
+
+/** Senegal flag (filled, not stroke-based). Decorative: hidden from AT. */
+export const FlagSN = (p: React.SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 30 20" aria-hidden="true" {...p}>
+    <rect width="10" height="20" fill="#00853f" />
+    <rect x="10" width="10" height="20" fill="#fdef42" />
+    <rect x="20" width="10" height="20" fill="#e31b23" />
+    <path d="M15 6.2l1.06 3.26h3.43l-2.77 2.02 1.06 3.26L15 12.72l-2.78 2.02 1.06-3.26-2.77-2.02h3.43z" fill="#00853f" />
+  </svg>
+);

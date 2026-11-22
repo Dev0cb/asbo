@@ -45,16 +45,16 @@ export const Header: React.FC<Props> = ({ lang, onToggleLang, theme, onToggleThe
 
   return (
     <header className="sticky top-0 z-50 border-b border-[var(--border)]/80 bg-[var(--bg)]/85 backdrop-blur">
-      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
         <a
           href="#/"
           onClick={(e) => {
             e.preventDefault();
             navigate('/');
           }}
-          className="flex items-center gap-2 font-bold tracking-tight text-[var(--text-heading)]"
+          className="flex h-11 items-center gap-2 font-bold tracking-tight text-[var(--text-heading)]"
         >
-          <IconShield className="h-6 w-6 text-[var(--color-accent)]" />
+          <IconShield className="h-6 w-6 text-[var(--accent-text)]" />
           <span className="text-lg">
             Sécurité<span className="hidden text-xs font-normal text-[var(--text-muted)] sm:inline"> .sn</span>
           </span>
@@ -81,7 +81,7 @@ export const Header: React.FC<Props> = ({ lang, onToggleLang, theme, onToggleThe
           ))}
         </nav>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           {installEvt && (
             <button
               onClick={() => installEvt.prompt()}
@@ -95,14 +95,14 @@ export const Header: React.FC<Props> = ({ lang, onToggleLang, theme, onToggleThe
           <button
             onClick={onToggleTheme}
             aria-label={t.ui.theme}
-            className="rounded-lg border border-[var(--border)] p-2 text-[var(--text)] transition-colors hover:border-[var(--color-accent)]"
+            className="flex h-11 w-11 items-center justify-center rounded-lg border border-[var(--border)] text-[var(--text)] transition-colors hover:border-[var(--color-accent)]"
           >
             {theme === 'dark' ? <IconSun className="h-4 w-4" /> : <IconMoon className="h-4 w-4" />}
           </button>
           <button
             onClick={onToggleLang}
             aria-label={t.ui.langSwitch}
-            className="rounded-lg border border-[var(--border)] px-2.5 py-1.5 font-mono text-xs font-medium text-[var(--text)] transition-colors hover:border-[var(--color-accent)]"
+            className="flex h-11 min-w-11 items-center justify-center rounded-lg border border-[var(--border)] px-2 font-mono text-xs font-medium text-[var(--text)] transition-colors hover:border-[var(--color-accent)]"
           >
             {lang === 'fr' ? 'EN' : 'FR'}
           </button>
@@ -113,7 +113,7 @@ export const Header: React.FC<Props> = ({ lang, onToggleLang, theme, onToggleThe
               navigate('/admin');
             }}
             aria-label="Admin"
-            className="rounded-lg border border-[var(--border)] p-2 text-[var(--text-muted)] transition-colors hover:border-[var(--color-accent)] hover:text-[var(--text-heading)]"
+            className="flex h-11 w-11 items-center justify-center rounded-lg border border-[var(--border)] text-[var(--text-muted)] transition-colors hover:border-[var(--color-accent)] hover:text-[var(--text-heading)]"
           >
             <IconLock className="h-4 w-4" />
           </a>
@@ -121,14 +121,15 @@ export const Header: React.FC<Props> = ({ lang, onToggleLang, theme, onToggleThe
             onClick={() => setOpen(!open)}
             aria-expanded={open}
             aria-label={t.ui.menu}
-            className="rounded-lg border border-[var(--border)] p-2 text-[var(--text)] lg:hidden"
+            aria-controls="mobile-nav"
+            className="flex h-11 w-11 items-center justify-center rounded-lg border border-[var(--border)] text-[var(--text)] lg:hidden"
           >
             <IconMenu className="h-4 w-4" />
           </button>
         </div>
       </div>
       {open && (
-        <nav className="border-t border-[var(--border)] bg-[var(--bg)] lg:hidden">
+        <nav id="mobile-nav" className="border-t border-[var(--border)] bg-[var(--bg)] lg:hidden">
           <ul className="mx-auto max-w-6xl px-4 py-2">
             {links.map((l) => (
               <li key={l.to}>

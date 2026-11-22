@@ -118,7 +118,7 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-[var(--bg)] text-[var(--text-muted)]">
+    <div className="flex min-h-dvh flex-col bg-[var(--bg)] text-[var(--text-muted)]">
       <div className="flag-bar fixed inset-x-0 top-0 z-[60] h-1" aria-hidden="true" />
       <div className="h-1" aria-hidden="true" />
       <a

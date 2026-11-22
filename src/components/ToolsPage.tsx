@@ -392,7 +392,7 @@ const Checklist: React.FC<{ lang: Lang }> = ({ lang }) => {
               <span
                 className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border ${
                   checked[i]
-                    ? 'border-[var(--good)] bg-[var(--good)] text-[#06281c]'
+                    ? 'border-[var(--good)] bg-[var(--good)] text-[var(--bg)]'
                     : 'border-[var(--border)] text-transparent'
                 }`}
               >

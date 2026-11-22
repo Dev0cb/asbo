@@ -91,7 +91,7 @@ export const PhishingTrainer: React.FC<{ lang: Lang }> = ({ lang }) => {
             <Icon className="h-5 w-5" />
           </span>
           <div className="min-w-0">
-            <p className="text-xs font-semibold uppercase tracking-wider" style={{ color }}>
+            <p className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]">
               {s.channel[current.channel]}
             </p>
             <p className="truncate text-sm text-[var(--text-heading)]">

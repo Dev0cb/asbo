@@ -15,7 +15,7 @@ export const RightsPage: React.FC<Props> = ({ lang }) => {
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
       <div className="flex items-center gap-4">
-        <span className="icon-tile h-12 w-12 bg-[var(--color-accent)]/10 text-[var(--color-accent)] sm:h-14 sm:w-14">
+        <span className="icon-tile h-12 w-12 bg-[var(--color-accent)]/10 text-[var(--accent-text)] sm:h-14 sm:w-14">
           <IconScale className="h-7 w-7 sm:h-8 sm:w-8" />
         </span>
         <h1 className="text-3xl font-extrabold tracking-tight text-[var(--text-heading)] sm:text-4xl">
@@ -34,7 +34,7 @@ export const RightsPage: React.FC<Props> = ({ lang }) => {
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           {RIGHT_KEYS.map((k) => (
             <div key={k} className="card p-5">
-              <h3 className="font-semibold text-[var(--color-accent)]">{t.rights[`${k}t` as const]}</h3>
+              <h3 className="font-semibold text-[var(--accent-text)]">{t.rights[`${k}t` as const]}</h3>
               <p className="mt-2 text-sm leading-relaxed text-[var(--text-muted)]">
                 {t.rights[`${k}d` as const]}
               </p>
@@ -48,7 +48,7 @@ export const RightsPage: React.FC<Props> = ({ lang }) => {
         <ol className="mt-4 space-y-3">
           {t.rights.howSteps.map((step, i) => (
             <li key={i} className="flex gap-3">
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--color-accent)]/10 font-mono text-sm font-bold text-[var(--color-accent)]">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--color-accent)]/10 font-mono text-sm font-bold text-[var(--accent-text)]">
                 {i + 1}
               </span>
               <span className="leading-relaxed text-[var(--text-muted)]">{step}</span>
@@ -74,7 +74,7 @@ export const RightsPage: React.FC<Props> = ({ lang }) => {
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => track('outbound_click', { target: 'cdp' })}
-              className="inline-flex items-center gap-1 font-medium text-[var(--color-accent)] hover:underline"
+              className="inline-flex min-h-11 items-center gap-1 font-medium text-[var(--accent-text)] hover:underline"
             >
               {t.rights.cdpSite} <IconExternal className="h-3.5 w-3.5" />
             </a>

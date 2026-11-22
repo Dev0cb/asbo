@@ -17,7 +17,7 @@ export const AboutPage: React.FC<Props> = ({ lang }) => {
         <div className="h-2 bg-gradient-to-r from-[var(--color-accent)] to-[var(--good)]" />
         <div className="p-6 sm:p-10">
           <div className="flex items-center gap-4">
-            <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--color-accent)]/10 text-[var(--color-accent)]">
+            <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--color-accent)]/10 text-[var(--accent-text)]">
               <IconUser className="h-9 w-9" />
             </span>
             <div>
