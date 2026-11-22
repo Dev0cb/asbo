@@ -1,11 +1,12 @@
 import React, { Suspense, lazy, useCallback, useEffect, useState } from 'react';
 import { STR, type Lang } from './i18n';
-import { parseHash, type Route } from './lib/router';
+import { parseHash, scrollToId, type Route } from './lib/router';
 import { track } from './lib/stats';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { Home } from './components/Home';
 import { GuidesPage } from './components/GuidesPage';
+import { GUIDES } from './data/guides';
 import { RightsPage } from './components/RightsPage';
 import { AboutPage } from './components/AboutPage';
 
@@ -74,9 +75,12 @@ const App: React.FC = () => {
 
   useEffect(() => {
     document.documentElement.lang = lang;
-    const section = route.path[0] ?? '';
-    const sectionTitle = TITLES[lang][section] ?? TITLES[lang][''];
-    document.title = section ? `${sectionTitle} · ASBO — Aar Sa Bopp Online` : 'ASBO — Aar Sa Bopp Online · Se protéger en ligne';
+    const [section = '', sub] = route.path;
+    const known = section in TITLES[lang];
+    const guide = section === 'guides' && sub ? GUIDES[lang].find((g) => g.slug === sub) : undefined;
+    const pageTitle = !known ? STR[lang].common.notFound : guide ? guide.title : TITLES[lang][section];
+    const tagline = lang === 'fr' ? 'Se protéger en ligne' : 'Stay safe online';
+    document.title = section ? `${pageTitle} · ASBO — Aar Sa Bopp Online` : `ASBO — Aar Sa Bopp Online · ${tagline}`;
   }, [lang, route]);
 
   const toggleLang = useCallback(() => {
@@ -112,14 +116,35 @@ const App: React.FC = () => {
     page = <AboutPage lang={lang} />;
   } else if (seg === 'admin') {
     page = <AdminPage lang={lang} />;
-  } else {
+  } else if (!seg) {
     page = <Home lang={lang} />;
+  } else {
+    page = (
+      <div className="mx-auto max-w-3xl px-4 py-24 text-center sm:px-6">
+        <p className="eyebrow justify-center">404</p>
+        <h1 className="mt-4 text-4xl font-semibold text-[var(--text-heading)]">{t.common.notFound}</h1>
+        <a
+          href="#/"
+          onClick={(e) => {
+            e.preventDefault();
+            window.location.hash = '#/';
+          }}
+          className="btn-primary mt-8"
+        >
+          {t.common.backHome}
+        </a>
+      </div>
+    );
   }
 
   return (
     <div className="flex min-h-dvh flex-col bg-[var(--bg)] text-[var(--text-muted)]">
       <a
         href="#main"
+        onClick={(e) => {
+          e.preventDefault();
+          scrollToId('main');
+        }}
         className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-lg focus:bg-[var(--bg-elevated)] focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-[var(--text-heading)]"
       >
         {t.ui.skip}
@@ -131,7 +156,7 @@ const App: React.FC = () => {
         onToggleTheme={toggleTheme}
         route={route.path}
       />
-      <main id="main" className="flex-1">
+      <main id="main" tabIndex={-1} className="flex-1 outline-none">
         <Suspense fallback={<div className="min-h-[60vh]" aria-busy="true" />}>{page}</Suspense>
       </main>
       <Footer lang={lang} />

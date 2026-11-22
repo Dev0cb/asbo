@@ -182,10 +182,12 @@ platform/
   `quiz_complete`, `checker_use`, `checklist_update`, `outbound_click`.
   `track()` is fire-and-forget and also mirrors to `localStorage`
   (`securite-local-events`) for the admin demo mode.
-- **Admin account**: `hajjmalickba@icloud.com` (Supabase Auth email/password).
-  Password was generated at setup and shared with the owner — he should
-  rotate it (Authentication → Users in dashboard). Only this account can
-  read `events` (RLS `authenticated` role).
+- **Admin account**: the owner's Supabase Auth email/password account (never
+  write the email in this public repo). Reads of `events` are restricted to
+  users listed in `public.admins` via `public.is_admin()` (migration 0002);
+  `daily_stats` is `security_invoker`. Public sign-up is enabled in Auth but
+  grants no read access. Add an admin: `insert into public.admins (user_id)
+  values ('<auth uid>');` in the SQL editor.
 - Admin dashboard `/#/admin`: without env vars it shows **local demo stats**;
   with Supabase it requires login, then aggregates up to 5000 recent events
   client-side (visitors ≈ distinct session_id, pageviews, quizzes, top

@@ -1,6 +1,7 @@
 import React from 'react';
 import { STR, type Lang } from '../i18n';
 import { IconAlert, IconArrow } from './icons';
+import { scrollToId } from '../lib/router';
 import { LetterGenerator } from './LetterGenerator';
 import { AUTHORITIES, AUTHORITY_STR } from '../data/letters';
 
@@ -26,7 +27,14 @@ export const RightsPage: React.FC<Props> = ({ lang }) => {
         <p className="eyebrow">{r.eyebrow}</p>
         <h1 className="mt-4 text-4xl font-semibold leading-[1.08] text-[var(--text-heading)] sm:text-5xl">{r.title}</h1>
         <p className="mt-5 text-lg leading-relaxed text-[var(--text-muted)]">{r.intro}</p>
-        <a href="#lettre" className="btn-primary mt-7">
+        <a
+          href="#lettre"
+          onClick={(e) => {
+            e.preventDefault();
+            scrollToId('lettre');
+          }}
+          className="btn-primary mt-7"
+        >
           {letterCta} <IconArrow className="h-4 w-4" />
         </a>
       </header>

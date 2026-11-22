@@ -111,7 +111,7 @@ export const PasswordTester: React.FC<{ lang: Lang }> = ({ lang }) => {
             <IconKey className="h-5 w-5" />
           </span>
           <div>
-            <h3 className="font-semibold text-[var(--text-heading)]">{s.genTitle}</h3>
+            <h2 className="font-sans text-base font-semibold text-[var(--text-heading)]">{s.genTitle}</h2>
             <p className="mt-1 text-sm text-[var(--text-muted)]">{s.genText}</p>
           </div>
         </div>

@@ -306,9 +306,10 @@ a.chip {
 .reveal {
   transition: opacity 0.4s ease-out, transform 0.4s ease-out;
 }
+/* Slide only — never fade: content must never be transparent (screen
+   readers, audits and slow devices all see it at full contrast). */
 .reveal.reveal-pending {
-  opacity: 0;
-  transform: translateY(12px);
+  transform: translateY(14px);
 }
 
 @media (prefers-reduced-motion: reduce) {
