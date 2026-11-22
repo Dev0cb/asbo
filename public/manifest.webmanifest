@@ -1,16 +1,19 @@
 {
-  "name": "Sécurité.sn — Apprendre à se protéger en ligne",
-  "short_name": "Sécurité",
-  "description": "Apprenez à protéger vos données personnelles et à rester en sécurité en ligne. Guides, quiz et outils gratuits pour tous les Sénégalais.",
+  "name": "ASBO — Aar Seu Bopp Online",
+  "short_name": "ASBO",
+  "description": "Se protéger en ligne : guides, outils et lettres pour exercer vos droits. Gratuit, pour tous les Sénégalais et tous les Africains.",
   "lang": "fr",
   "dir": "ltr",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#0b1020",
-  "theme_color": "#0b1020",
-  "categories": ["education", "utilities"],
+  "background_color": "#f4efe4",
+  "theme_color": "#0b6b43",
+  "categories": [
+    "education",
+    "utilities"
+  ],
   "icons": [
     {
       "src": "./icons/icon-192.png",

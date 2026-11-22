@@ -30,7 +30,7 @@ const TITLES: Record<Lang, Record<string, string>> = {
     guides: 'Guides',
     outils: 'Outils',
     droits: 'Vos droits',
-    auteur: 'L\'auteur',
+    auteur: 'Le concepteur',
     admin: 'Admin',
   },
   en: {
@@ -38,21 +38,20 @@ const TITLES: Record<Lang, Record<string, string>> = {
     guides: 'Guides',
     outils: 'Tools',
     droits: 'Your rights',
-    auteur: 'Author',
+    auteur: 'The designer',
     admin: 'Admin',
   },
 };
 
 const App: React.FC = () => {
   const [lang, setLang] = useState<Lang>(initialLang);
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  const [theme, setTheme] = useState<'dark' | 'light'>('light');
   const [route, setRoute] = useState<Route>(parseHash());
 
   useEffect(() => {
-    // Dark-first: the platform's impact relies on the rich dark theme.
-    // A saved user choice still wins.
+    // Light "paper" theme is the primary design; a saved choice still wins.
     const savedTheme = localStorage.getItem('securite-theme') as 'dark' | 'light' | null;
-    const initial = savedTheme || 'dark';
+    const initial = savedTheme || 'light';
     setTheme(initial);
     document.documentElement.setAttribute('data-theme', initial);
   }, []);
@@ -77,7 +76,7 @@ const App: React.FC = () => {
     document.documentElement.lang = lang;
     const section = route.path[0] ?? '';
     const sectionTitle = TITLES[lang][section] ?? TITLES[lang][''];
-    document.title = `Sécurité — ${sectionTitle} | Sécurité numérique au Sénégal`;
+    document.title = section ? `${sectionTitle} · ASBO — Aar Seu Bopp Online` : 'ASBO — Aar Seu Bopp Online · Se protéger en ligne';
   }, [lang, route]);
 
   const toggleLang = useCallback(() => {
@@ -119,8 +118,6 @@ const App: React.FC = () => {
 
   return (
     <div className="flex min-h-dvh flex-col bg-[var(--bg)] text-[var(--text-muted)]">
-      <div className="flag-bar fixed inset-x-0 top-0 z-[60] h-1" aria-hidden="true" />
-      <div className="h-1" aria-hidden="true" />
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-lg focus:bg-[var(--bg-elevated)] focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-[var(--text-heading)]"

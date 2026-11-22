@@ -1,22 +1,25 @@
-# Sécurité — Plateforme d'éducation à la sécurité numérique (Sénégal)
+# ASBO — Aar Seu Bopp Online
 
-Progressive Web App gratuite et pédagogique pour aider tous les Sénégalais à
-protéger leurs données personnelles et à pratiquer des usages en ligne sûrs.
+**ASBO Platform** (« aar seu bopp » : *se protéger*, en wolof) est une
+Progressive Web App gratuite d'éducation à la sécurité numérique, conçue au
+Sénégal pour l'Afrique : déjouer les arnaques, protéger ses comptes et faire
+valoir ses droits sur ses données personnelles.
 Conçue et développée par **Malick BA** — <https://malickba.me>.
+
+URL : <https://asbo.malickba.me>
 
 ## Fonctionnalités
 
 - **9 guides pratiques** (hameçonnage, Mobile Money, mots de passe, réseaux
   sociaux, téléphone, Wi-Fi public, enfants, infox, que faire en cas d'arnaque)
-- **3 outils interactifs** : quiz « êtes-vous en sécurité ? », détecteur
-  d'arnaque 100 % local, checklist de protection sauvegardée sur l'appareil
-- **Section « Vos droits »** : loi n° 2008-12, droits CDP, contacts de la
-  Commission de Protection des Données Personnelles
-- **Dashboard admin** (`/#/admin`) : statistiques d'usage via Supabase
-  (visiteurs, pages vues, quiz, guides populaires, scores)
-- **PWA** : installable, fonctionne hors ligne (service worker), responsive
-  mobile / tablette / desktop
-- **Bilingue FR/EN** avec détection automatique de la langue
+- **Outils interactifs** : quiz expliqué, « Vrai ou arnaque ? », détecteur
+  d'arnaque, testeur de mot de passe, « Vos données parlent », checklist
+- **Vos droits** (loi n° 2008-12) + **générateur de lettres** (accès,
+  rectification, suppression, opposition, prospection) — texte original,
+  100 % local
+- **PWA** : installable, hors ligne, responsive ; bilingue FR/EN
+- Statistiques d'usage anonymes (Supabase) consultables sur une route admin
+  non liée dans l'interface
 
 ## Stack
 

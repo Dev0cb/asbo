@@ -145,7 +145,7 @@ function DashboardView({
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-extrabold text-[var(--text-heading)]">{t.admin.title}</h1>
+          <h1 className="text-2xl font-semibold text-[var(--text-heading)]">{t.admin.title}</h1>
           {demo && (
             <p className="mt-1 text-sm font-medium text-[var(--warn)]">{t.admin.demo}</p>
           )}
@@ -168,13 +168,13 @@ function DashboardView({
           <div className="mt-4 flex h-36 items-end gap-2">
             {stats.days.map((d) => (
               <div key={d.date} className="flex flex-1 flex-col items-center gap-1">
-                <span className="text-[10px] text-[var(--text-muted)]">{d.count || ''}</span>
+                <span className="text-xs text-[var(--text-muted)]">{d.count || ''}</span>
                 <div
                   className="w-full rounded-t-md bg-[var(--color-accent)]/80"
                   style={{ height: `${Math.max((d.count / stats.maxDay) * 100, d.count ? 4 : 2)}%` }}
                   title={`${d.date}: ${d.count}`}
                 />
-                <span className="text-[10px] text-[var(--text-muted)]">{d.date}</span>
+                <span className="text-xs text-[var(--text-muted)]">{d.date}</span>
               </div>
             ))}
           </div>
@@ -311,7 +311,7 @@ const DemoDashboard: React.FC<{ lang: Lang }> = ({ lang }) => {
       <div className="mx-auto max-w-6xl px-4 pt-8 sm:px-6">
         <div className="card flex flex-col gap-4 border-[var(--warn)]/40 p-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-xl font-extrabold text-[var(--text-heading)]">{t.admin.title}</h1>
+            <h1 className="text-xl font-semibold text-[var(--text-heading)]">{t.admin.title}</h1>
             <p className="mt-1 max-w-xl text-sm text-[var(--text-muted)]">{t.admin.noBackend}</p>
           </div>
           <div className="flex items-center gap-2 text-sm text-[var(--warn)]">
@@ -408,7 +408,7 @@ const SupabaseDashboard: React.FC<{ lang: Lang }> = ({ lang }) => {
         <form onSubmit={login} className="card w-full p-6 sm:p-8">
           <div className="flex items-center gap-3">
             <IconLock className="h-7 w-7 text-[var(--accent-text)]" />
-            <h1 className="text-xl font-extrabold text-[var(--text-heading)]">{t.admin.loginTitle}</h1>
+            <h1 className="text-xl font-semibold text-[var(--text-heading)]">{t.admin.loginTitle}</h1>
           </div>
           <p className="mt-2 text-sm text-[var(--text-muted)]">{t.admin.loginSub}</p>
           <label className="mt-6 block text-sm font-medium text-[var(--text)]">

@@ -1,14 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { STR, type Lang } from '../i18n';
 import { navigate } from '../lib/router';
-import {
-  IconShield,
-  IconMenu,
-  IconMoon,
-  IconSun,
-  IconDownload,
-  IconLock,
-} from './icons';
+import { AsboMark, IconMenu, IconMoon, IconSun, IconDownload } from './icons';
 
 interface Props {
   lang: Lang;
@@ -44,7 +37,7 @@ export const Header: React.FC<Props> = ({ lang, onToggleLang, theme, onToggleThe
     to === '/' ? route.length === 0 : route[0] === to.slice(1);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-[var(--border)]/80 bg-[var(--bg)]/85 backdrop-blur">
+    <header className="sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--bg)]/95 backdrop-blur-sm">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
         <a
           href="#/"
@@ -52,11 +45,15 @@ export const Header: React.FC<Props> = ({ lang, onToggleLang, theme, onToggleThe
             e.preventDefault();
             navigate('/');
           }}
-          className="flex h-11 items-center gap-2 font-bold tracking-tight text-[var(--text-heading)]"
+          className="flex h-11 items-center gap-2.5 text-[var(--text-heading)]"
+          aria-label="ASBO, Aar Seu Bopp Online"
         >
-          <IconShield className="h-6 w-6 text-[var(--accent-text)]" />
-          <span className="text-lg">
-            Sécurité<span className="hidden text-xs font-normal text-[var(--text-muted)] sm:inline"> .sn</span>
+          <AsboMark className="h-8 w-8" />
+          <span className="flex flex-col leading-none">
+            <span className="text-[17px] font-bold tracking-tight">ASBO</span>
+            <span className="mt-1 hidden font-mono text-xs uppercase tracking-[0.16em] text-[var(--text-muted)] sm:block">
+              Aar Seu Bopp Online
+            </span>
           </span>
         </a>
 
@@ -70,10 +67,11 @@ export const Header: React.FC<Props> = ({ lang, onToggleLang, theme, onToggleThe
                 navigate(l.to);
                 setOpen(false);
               }}
-              className={`rounded-lg px-3 py-2 text-sm transition-colors ${
+              aria-current={isActive(l.to) ? 'page' : undefined}
+              className={`relative flex h-11 items-center px-3 text-sm font-medium transition-colors after:absolute after:inset-x-3 after:bottom-2 after:h-px after:transition-colors ${
                 isActive(l.to)
-                  ? 'bg-[var(--bg-elevated)] font-medium text-[var(--text-heading)]'
-                  : 'text-[var(--text-muted)] hover:text-[var(--text-heading)]'
+                  ? 'text-[var(--text-heading)] after:bg-[var(--rule)]'
+                  : 'text-[var(--text-muted)] after:bg-transparent hover:text-[var(--text-heading)]'
               }`}
             >
               {l.label}
@@ -85,7 +83,7 @@ export const Header: React.FC<Props> = ({ lang, onToggleLang, theme, onToggleThe
           {installEvt && (
             <button
               onClick={() => installEvt.prompt()}
-              className="hidden items-center gap-1.5 rounded-lg border border-[var(--border)] px-2.5 py-1.5 text-xs font-medium text-[var(--text)] transition-colors hover:border-[var(--color-accent)] sm:flex"
+              className="hidden items-center gap-1.5 rounded-lg border border-[var(--border)] px-2.5 py-1.5 text-xs font-medium text-[var(--text)] transition-colors hover:border-[var(--rule)] sm:flex"
               title={t.ui.install}
             >
               <IconDownload className="h-4 w-4" />
@@ -95,28 +93,17 @@ export const Header: React.FC<Props> = ({ lang, onToggleLang, theme, onToggleThe
           <button
             onClick={onToggleTheme}
             aria-label={t.ui.theme}
-            className="flex h-11 w-11 items-center justify-center rounded-lg border border-[var(--border)] text-[var(--text)] transition-colors hover:border-[var(--color-accent)]"
+            className="flex h-11 w-11 items-center justify-center rounded-lg border border-[var(--border)] text-[var(--text)] transition-colors hover:border-[var(--rule)]"
           >
             {theme === 'dark' ? <IconSun className="h-4 w-4" /> : <IconMoon className="h-4 w-4" />}
           </button>
           <button
             onClick={onToggleLang}
             aria-label={t.ui.langSwitch}
-            className="flex h-11 min-w-11 items-center justify-center rounded-lg border border-[var(--border)] px-2 font-mono text-xs font-medium text-[var(--text)] transition-colors hover:border-[var(--color-accent)]"
+            className="flex h-11 min-w-11 items-center justify-center rounded-lg border border-[var(--border)] px-2 font-mono text-xs font-medium text-[var(--text)] transition-colors hover:border-[var(--rule)]"
           >
             {lang === 'fr' ? 'EN' : 'FR'}
           </button>
-          <a
-            href="#/admin"
-            onClick={(e) => {
-              e.preventDefault();
-              navigate('/admin');
-            }}
-            aria-label="Admin"
-            className="flex h-11 w-11 items-center justify-center rounded-lg border border-[var(--border)] text-[var(--text-muted)] transition-colors hover:border-[var(--color-accent)] hover:text-[var(--text-heading)]"
-          >
-            <IconLock className="h-4 w-4" />
-          </a>
           <button
             onClick={() => setOpen(!open)}
             aria-expanded={open}

@@ -1,35 +1,40 @@
 <!doctype html>
-<html lang="fr" data-theme="dark">
+<html lang="fr" data-theme="light">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <link rel="apple-touch-icon" href="./icons/icon-192.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>Sécurité — Apprendre à se protéger en ligne | Sénégal</title>
+    <title>ASBO — Aar Seu Bopp Online · Se protéger en ligne</title>
     <meta
       name="description"
-      content="Sécurité est une plateforme sénégalaise gratuite et pédagogique pour apprendre à protéger ses données personnelles et à rester en sécurité en ligne : guides simples, outils interactifs et vos droits (CDP.sn)."
+      content="ASBO (Aar Seu Bopp Online, « se protéger en ligne » en wolof) apprend gratuitement à chaque Sénégalais et à chaque Africain à déjouer les arnaques, protéger ses comptes et faire valoir ses droits sur ses données. Conçu par Malick BA."
     />
-    <meta name="theme-color" content="#070b16" />
+    <meta name="author" content="Malick BA" />
+    <meta name="theme-color" content="#f4efe4" />
     <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="canonical" href="https://asbo.malickba.me/" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Sécurité — Protégez vos données, apprenez la sécurité en ligne" />
+    <meta property="og:site_name" content="ASBO Platform" />
+    <meta property="og:url" content="https://asbo.malickba.me/" />
+    <meta property="og:title" content="ASBO — Aar Seu Bopp Online · Se protéger en ligne" />
     <meta
       property="og:description"
-      content="Plateforme gratuite d'éducation à la sécurité numérique pour tous les Sénégalais : guides, quiz, détecteur d'arnaques et vos droits en matière de données personnelles."
+      content="Arnaques Mobile Money, comptes WhatsApp volés, données personnelles : apprenez à vous protéger, gratuitement, sur n'importe quel téléphone."
     />
+    <meta property="og:image" content="https://asbo.malickba.me/icons/icon-512.png" />
+    <meta name="twitter:card" content="summary" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500..700&family=JetBrains+Mono:wght@400;500;700&family=Public+Sans:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
     <script>
       (function () {
         try {
           var saved = localStorage.getItem("securite-theme");
-          var theme = saved || "dark";
-          document.documentElement.setAttribute("data-theme", theme);
+          document.documentElement.setAttribute("data-theme", saved || "light");
         } catch (e) {}
       })();
     </script>
@@ -38,8 +43,7 @@
     <div id="root"></div>
     <noscript>
       <p style="font-family: sans-serif; padding: 24px">
-        Sécurité — Apprendre à se protéger en ligne. Cette plateforme a besoin de
-        JavaScript pour fonctionner.
+        ASBO — Aar Seu Bopp Online. Cette plateforme a besoin de JavaScript pour fonctionner.
       </p>
     </noscript>
     <script type="module" src="/src/main.tsx"></script>

@@ -1,16 +1,16 @@
-# Sécurité.sn — Agent Handoff Report
+# ASBO (Aar Seu Bopp Online) — Agent Handoff Report
 
 Complete context for continuing development on this project. Read this file
 first, then `README.md`.
 
 ## What this is
 
-**Sécurité.sn** is a free Progressive Web App that teaches every Senegalese
+**ASBO Platform** — *Aar Seu Bopp Online* (Wolof: "protect yourself online"; brand spelling chosen by the owner) — is a free Progressive Web App that teaches every Senegalese
 user to protect their personal data and browse safely online. It is an
 independent civic initiative by **Malick BA** (software/data/AI engineer,
 DevSecOps practitioner) — <https://malickba.me>.
 
-Live URL: **https://securite.malickba.me** (GitHub Pages, custom domain).
+Live URL: **https://asbo.malickba.me** (GitHub Pages, custom domain; formerly securite.malickba.me).
 Repo: **https://github.com/Dev0cb/securite** (public, `main` branch).
 It is a *separate* repo from the portfolio repo
 (`malick-ba---devsecops---software-engineer-portfolio`) — do NOT merge them.
@@ -26,7 +26,7 @@ working in `platform/` and pushing to the `securite` remote.
   worker, cache name `securite-vN` — bump on every release)
 - Supabase (`@supabase/supabase-js`, **lazy-loaded** via dynamic import so the
   main bundle stays ~100 kB gzip; Tools/Admin pages are `React.lazy` chunks, Tools is prefetched on idle so it works offline for low-end devices / slow connections)
-- Bilingual FR/EN, **dark theme by default** (light theme still available)
+- Bilingual FR/EN, **light "paper" theme by default** (dark theme available)
 
 ## Commands
 
@@ -106,6 +106,37 @@ platform/
 (dashboard). Guide slugs (same in FR/EN): `hameconnage`, `mobile-money`,
 `mots-de-passe`, `reseaux-sociaux`, `telephone-appareil`, `wifi-public`,
 `enfants-en-ligne`, `infox-faux-profils`, `que-faire-urgence`.
+
+## Brand, voice & positioning (owner's instructions, 2026-11-22)
+
+- Name: **ASBO** / **Aar Seu Bopp Online** / "ASBO Platform". Logo = keyhole
+  that is also a person (`AsboMark` in icons.tsx, `public/favicon.svg`).
+- Personal branding: Malick BA — Senegalese software engineer specialised in
+  distributed systems (Master 2 Systèmes d'Information Répartis, UCAD);
+  certified GDPR & Data Privacy, Data Governance (DataCamp), Digital Security &
+  Secure Online Practices (Code for Africa). Source of truth: portfolio repo
+  `components/Interface.tsx`.
+- **Never blame the CDP or institutions.** Justify ASBO by the problems
+  (mobile-money fraud, WhatsApp account theft, young under-prepared users,
+  little-known rights) — not by others' shortcomings.
+- **Keep CDP visibility low** (owner wants a future partnership, not free
+  promotion): no CDP CTA/links/contact card. Refer neutrally to "l'autorité de
+  protection des données personnelles" only where legally useful.
+- Do NOT rehost CDP's PDF templates (copyright unclear, signed URLs expire).
+  ASBO's own letters live in `data/letters.ts` (art. 62 access, art. 68
+  objection, art. 69 rectification/deletion of loi 2008-12 du 25/01/2008).
+- No tech-stack mention in the UI. No Admin link in the header; `#/admin`
+  stays as a hidden route (usage stats = impact proof for partners).
+
+## Design system ("civic security bulletin")
+
+- Fonts: Fraunces (display, h1/h2 automatically), Public Sans (body),
+  JetBrains Mono (labels). Paper `#f4efe4` / ink `#16150f`, brand green
+  `--brand`, ochre `.mark` highlighter, kola red `--bad`.
+- Patterns: `.eyebrow` ("01 — POURQUOI"), `.rule-top` hairlines, flat
+  `.card` (hover = ink border, no lift/glow), hairline grids
+  (`gap-px bg-[var(--border)]`), `.stamp`, `.dot-grid` (hero only).
+- Avoid: gradients, glow, blobs, rainbow icon tiles, emoji icons.
 
 ## UI/UX rules (enforced by the 2026-11-22 audit)
 
@@ -214,5 +245,5 @@ for Senegal and the Sécurité design system:
 - Commit style: short imperative subject (see `git log`). The portfolio repo uses the same convention.
 - Never commit `.env.local` or secrets; anon key is public-by-design but
   keep service-role keys out of the repo entirely.
-- After any UI change: bump `CACHE` in `public/sw.js`, rebuild, push,
+- After any UI change: bump `CACHE` (`asbo-vN`) in `public/sw.js`, rebuild, push,
   then tell the user to hard-refresh (SW caches aggressively on phones).

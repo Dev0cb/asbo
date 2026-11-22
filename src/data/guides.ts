@@ -293,7 +293,7 @@ export const GUIDES: Record<'fr' | 'en', Guide[]> = {
         {
           heading: 'En cas de problème',
           body: [
-            'Conservez les captures d\'écran comme preuve. Signalez les contenus abusifs via les outils de signalement des plateformes et, si nécessaire, au commissariat cyber (ou à la division concernée de la police). Pour les données personnelles des enfants, la CDP peut être saisie.',
+            'Conservez les captures d\'écran comme preuve. Signalez les contenus abusifs via les outils de signalement des plateformes et, si nécessaire, au commissariat cyber (ou à la division concernée de la police). Pour les données personnelles des enfants, exercez vos droits avec une lettre générée dans la section « Vos droits ».',
           ],
         },
       ],
@@ -360,7 +360,7 @@ export const GUIDES: Record<'fr' | 'en', Guide[]> = {
           heading: 'Déposer plainte et se faire aider',
           body: [
             'Déposez plainte au commissariat le plus proche ou à la brigade de cybercriminalité. Le procès-verbal est indispensable pour votre opérateur, votre banque ou votre assurance.',
-            'Pour les données personnelles, vous pouvez saisir la CDP (Commission de Protection des Données Personnelles) — voir la section « Vos droits ».',
+            'Pour vos données personnelles, la section « Vos droits » vous explique vos recours et rédige pour vous la lettre à envoyer.',
           ],
         },
       ],
@@ -645,7 +645,7 @@ export const GUIDES: Record<'fr' | 'en', Guide[]> = {
         {
           heading: 'If something happens',
           body: [
-            'Keep screenshots as evidence. Report abusive content via the platforms\' reporting tools and, if needed, to the police. For children\'s personal data, the CDP can be contacted.',
+            'Keep screenshots as evidence. Report abusive content via the platforms\' reporting tools and, if needed, to the police. For children\'s personal data, exercise your rights with a letter generated in the "Your rights" section.',
           ],
         },
       ],
@@ -712,7 +712,7 @@ export const GUIDES: Record<'fr' | 'en', Guide[]> = {
           heading: 'File a complaint and get help',
           body: [
             'File a complaint at the nearest police station or cybercrime unit. The report is essential for your operator, bank or insurance.',
-            'For personal data matters, you can contact the CDP (Commission de Protection des Données Personnelles) — see the "Your rights" section.',
+            'For personal data matters, the "Your rights" section explains your options and drafts the letter for you.',
           ],
         },
       ],

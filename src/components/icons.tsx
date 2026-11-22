@@ -196,3 +196,12 @@ export const FlagSN = (p: React.SVGProps<SVGSVGElement>) => (
     <path d="M15 6.2l1.06 3.26h3.43l-2.77 2.02 1.06 3.26L15 12.72l-2.78 2.02 1.06-3.26-2.77-2.02h3.43z" fill="#00853f" />
   </svg>
 );
+
+/** ASBO logo mark: a keyhole that is also a person — "protect yourself". */
+export const AsboMark = (p: React.SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 64 64" aria-hidden="true" {...p}>
+    <rect width="64" height="64" rx="14" fill="var(--brand)" />
+    <circle cx="32" cy="24.5" r="8.5" fill="#f4efe4" />
+    <path d="M27.6 30.5h8.8l5 19.5H22.6z" fill="#f4efe4" stroke="#f4efe4" strokeWidth="1.6" strokeLinejoin="round" />
+  </svg>
+);

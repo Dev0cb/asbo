@@ -56,7 +56,7 @@ export const ToolsPage: React.FC<Props> = ({ lang, slug }) => {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
-      <h1 className="text-3xl font-extrabold tracking-tight text-[var(--text-heading)] sm:text-4xl">
+      <h1 className="text-3xl font-semibold tracking-tight text-[var(--text-heading)] sm:text-4xl">
         {t.tools.title}
       </h1>
       <p className="mt-3 max-w-2xl text-[var(--text-muted)]">{t.tools.intro}</p>
@@ -70,7 +70,7 @@ export const ToolsPage: React.FC<Props> = ({ lang, slug }) => {
             onClick={() => selectTab(tb.id)}
             className={`rounded-lg px-2 py-2.5 text-center text-xs font-medium leading-tight transition-colors sm:px-2 sm:text-sm ${
               tab === tb.id
-                ? 'bg-[var(--color-accent)] text-[#1a1207]'
+                ? 'bg-[var(--text-heading)] text-[var(--bg)]'
                 : 'border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-heading)]'
             }`}
           >
@@ -151,7 +151,7 @@ const Quiz: React.FC<{ lang: Lang }> = ({ lang }) => {
           </button>
           <button
             onClick={() => {
-              const text = `Sécurité — ${t.tools.quizResult} : ${score}/${max} (${res.level})`;
+              const text = `ASBO — ${t.tools.quizResult} : ${score}/${max} (${res.level})`;
               if (navigator.share) {
                 navigator.share({ text }).catch(() => {});
               } else {

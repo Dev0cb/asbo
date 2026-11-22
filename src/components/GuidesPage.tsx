@@ -6,17 +6,6 @@ import { navigate } from '../lib/router';
 import { GUIDE_ICONS, IconArrow, IconClock, IconCheck } from './icons';
 import { Reveal } from './Reveal';
 
-const ICON_COLORS: Record<string, string> = {
-  phish: '#f87171',
-  money: '#34d399',
-  key: '#fbbf24',
-  share: '#38bdf8',
-  phone: '#a78bfa',
-  wifi: '#22d3ee',
-  child: '#f472b6',
-  news: '#fb923c',
-  alert: '#f87171',
-};
 
 interface Props {
   lang: Lang;
@@ -67,7 +56,7 @@ const GuidesIndex: React.FC<{ lang: Lang; guides: Guide[] }> = ({ lang, guides }
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
-      <h1 className="text-3xl font-extrabold tracking-tight text-[var(--text-heading)] sm:text-4xl">
+      <h1 className="text-3xl font-semibold tracking-tight text-[var(--text-heading)] sm:text-4xl">
         {t.guides.title}
       </h1>
       <p className="mt-3 max-w-2xl text-[var(--text-muted)]">{t.guides.intro}</p>
@@ -85,7 +74,6 @@ const GuidesIndex: React.FC<{ lang: Lang; guides: Guide[] }> = ({ lang, guides }
         <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((g, i) => {
             const Icon = GUIDE_ICONS[g.icon] || IconCheck;
-            const color = ICON_COLORS[g.icon] || '#f59e0b';
             return (
               <Reveal key={g.slug} delay={(i % 3) * 80}>
               <a
@@ -98,8 +86,7 @@ const GuidesIndex: React.FC<{ lang: Lang; guides: Guide[] }> = ({ lang, guides }
               >
                 <div className="flex items-start justify-between">
                   <span
-                    className="icon-tile h-12 w-12"
-                    style={{ background: `${color}1a`, color }}
+                    className="icon-tile h-11 w-11 border border-[var(--border)] text-[var(--accent-text)]"
                   >
                     <Icon className="h-6 w-6" />
                   </span>
@@ -175,12 +162,11 @@ const GuideArticle: React.FC<{ lang: Lang; guide: Guide; guides: Guide[] }> = ({
         </div>
         <div className="mt-4 flex items-start gap-4">
           <span
-            className="icon-tile hidden h-14 w-14 shrink-0 sm:flex"
-            style={{ background: `${ICON_COLORS[guide.icon] || '#f59e0b'}1a`, color: ICON_COLORS[guide.icon] || '#f59e0b' }}
+            className="icon-tile hidden h-14 w-14 shrink-0 border border-[var(--border)] text-[var(--accent-text)] sm:flex"
           >
             <Icon className="h-8 w-8" />
           </span>
-          <h1 className="text-3xl font-extrabold leading-tight tracking-tight text-[var(--text-heading)] sm:text-4xl">
+          <h1 className="text-3xl font-semibold leading-tight tracking-tight text-[var(--text-heading)] sm:text-4xl">
             {guide.title}
           </h1>
         </div>
