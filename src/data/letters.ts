@@ -150,7 +150,7 @@ export function buildLetter(kind: LetterKind, f: LetterFields): string {
     'Madame, Monsieur,',
     '',
     ...body(kind, f).flatMap((p) => [p, '']),
-    'Je vous remercie de bien vouloir donner suite à ma demande dans les meilleurs délais. À défaut de réponse satisfaisante, je me réserve la possibilité d\'adresser une réclamation à l\'autorité de protection des données personnelles.',
+    'Je vous remercie de bien vouloir donner suite à ma demande dans les meilleurs délais. À défaut de réponse satisfaisante, je me réserve la possibilité de saisir la Commission de Protection des Données Personnelles (CDP).',
     '',
     'Je vous prie d\'agréer, Madame, Monsieur, l\'expression de mes salutations distinguées.',
     '',
@@ -182,6 +182,7 @@ export const LETTER_STR = {
     print: 'Imprimer / PDF',
     share: 'Partager',
     langNote: '',
+    lawNote: 'Cette lettre s\'appuie sur la loi sénégalaise et vise la CDP. Si l\'organisation est établie dans un autre pays, citez la loi et l\'autorité de ce pays (voir « Une autorité par pays » ci-dessus).',
   },
   en: {
     eyebrow: 'Tool · Letter generator',
@@ -204,5 +205,54 @@ export const LETTER_STR = {
     print: 'Print / PDF',
     share: 'Share',
     langNote: 'Letters are written in French, the language of administrative correspondence in Senegal.',
+    lawNote: 'This letter relies on Senegalese law and refers to the CDP. If the organisation is established in another country, cite that country\'s law and authority (see "One authority per country" above).',
+  },
+};
+
+/* ===================== Data protection authorities ===================== */
+// Indicative list: each country has its own law and supervisory authority.
+// Check the texts in force before relying on them for a specific case.
+
+export interface Authority {
+  country: Record<Lang, string>;
+  authority: string;
+  law: string;
+}
+
+export const AUTHORITIES: Authority[] = [
+  { country: { fr: 'Sénégal', en: 'Senegal' }, authority: 'CDP — Commission de Protection des Données Personnelles', law: 'Loi n° 2008-12 du 25 janvier 2008' },
+  { country: { fr: 'Côte d\'Ivoire', en: 'Côte d\'Ivoire' }, authority: 'ARTCI', law: 'Loi n° 2013-450 du 19 juin 2013' },
+  { country: { fr: 'Mali', en: 'Mali' }, authority: 'APDP', law: 'Loi n° 2013-015 du 21 mai 2013' },
+  { country: { fr: 'Burkina Faso', en: 'Burkina Faso' }, authority: 'CIL — Commission de l\'Informatique et des Libertés', law: 'Loi n° 001-2021/AN du 30 mars 2021' },
+  { country: { fr: 'Bénin', en: 'Benin' }, authority: 'APDP', law: 'Loi n° 2017-20 portant Code du numérique' },
+  { country: { fr: 'Togo', en: 'Togo' }, authority: 'IPDCP', law: 'Loi n° 2019-014 du 29 octobre 2019' },
+  { country: { fr: 'Maroc', en: 'Morocco' }, authority: 'CNDP', law: 'Loi n° 09-08 du 18 février 2009' },
+  { country: { fr: 'Ghana', en: 'Ghana' }, authority: 'Data Protection Commission', law: 'Data Protection Act, 2012 (Act 843)' },
+  { country: { fr: 'Nigeria', en: 'Nigeria' }, authority: 'NDPC — Nigeria Data Protection Commission', law: 'Nigeria Data Protection Act 2023' },
+  { country: { fr: 'Kenya', en: 'Kenya' }, authority: 'ODPC — Office of the Data Protection Commissioner', law: 'Data Protection Act 2019' },
+];
+
+export const AUTHORITY_STR = {
+  fr: {
+    eyebrow: 'À savoir',
+    title: 'Une autorité par pays',
+    p1: 'Une « autorité de protection des données » est l\'organisme public indépendant chargé, dans un pays donné, de faire respecter la loi sur les données personnelles : elle informe, contrôle les organisations, reçoit les réclamations et peut prononcer des sanctions.',
+    p2: 'Il n\'en existe pas une seule pour toute l\'Afrique : chaque pays a sa propre loi, avec ses propres articles, et sa propre autorité. Le texte applicable dépend en général du pays où l\'organisation est établie et de celui où vous résidez.',
+    p3: 'Au niveau régional, l\'Acte additionnel de la CEDEAO (2010) et la Convention de l\'Union africaine dite de Malabo (2014) fixent des principes communs, que chaque pays applique à travers sa loi nationale.',
+    colCountry: 'Pays',
+    colAuthority: 'Autorité',
+    colLaw: 'Loi principale',
+    disclaimer: 'Liste indicative et non exhaustive. Les textes évoluent : vérifiez la loi en vigueur avant toute démarche.',
+  },
+  en: {
+    eyebrow: 'Good to know',
+    title: 'One authority per country',
+    p1: 'A "data protection authority" is the independent public body that enforces personal data law in a given country: it informs, audits organisations, handles complaints and can impose sanctions.',
+    p2: 'There is no single one for all of Africa: each country has its own law, with its own articles, and its own authority. The applicable law generally depends on the country where the organisation is established and the one where you live.',
+    p3: 'At regional level, the ECOWAS Supplementary Act (2010) and the African Union Malabo Convention (2014) set common principles, which each country applies through its national law.',
+    colCountry: 'Country',
+    colAuthority: 'Authority',
+    colLaw: 'Main law',
+    disclaimer: 'Indicative, non-exhaustive list. Laws change: check the law in force before taking action.',
   },
 };

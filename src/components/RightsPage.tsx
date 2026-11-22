@@ -2,6 +2,7 @@ import React from 'react';
 import { STR, type Lang } from '../i18n';
 import { IconAlert, IconArrow } from './icons';
 import { LetterGenerator } from './LetterGenerator';
+import { AUTHORITIES, AUTHORITY_STR } from '../data/letters';
 
 interface Props {
   lang: Lang;
@@ -16,6 +17,7 @@ const RIGHTS = [
 
 export const RightsPage: React.FC<Props> = ({ lang }) => {
   const r = STR[lang].rights;
+  const au = AUTHORITY_STR[lang];
   const letterCta = lang === 'fr' ? 'Générer ma lettre' : 'Generate my letter';
 
   return (
@@ -68,6 +70,41 @@ export const RightsPage: React.FC<Props> = ({ lang }) => {
             <p className="mt-1 text-sm leading-relaxed text-[var(--text-muted)]">{r.warnText}</p>
           </div>
         </aside>
+      </section>
+
+      <section className="rule-top mt-16 pt-8" aria-labelledby="authorities-title">
+        <div className="grid gap-8 lg:grid-cols-[1fr_1.4fr]">
+          <div>
+            <p className="eyebrow">{au.eyebrow}</p>
+            <h2 id="authorities-title" className="mt-3 text-3xl font-semibold text-[var(--text-heading)]">{au.title}</h2>
+            <p className="mt-4 leading-relaxed text-[var(--text)]">{au.p1}</p>
+            <p className="mt-3 leading-relaxed text-[var(--text-muted)]">{au.p2}</p>
+            <p className="mt-3 leading-relaxed text-[var(--text-muted)]">{au.p3}</p>
+          </div>
+          <div>
+            <div className="overflow-x-auto rounded-lg border border-[var(--border)] bg-[var(--bg-card)]">
+              <table className="w-full min-w-[520px] text-left text-sm">
+                <thead>
+                  <tr className="border-b border-[var(--rule)] font-mono text-xs uppercase tracking-[0.12em] text-[var(--text-muted)]">
+                    <th scope="col" className="px-4 py-3 font-medium">{au.colCountry}</th>
+                    <th scope="col" className="px-4 py-3 font-medium">{au.colAuthority}</th>
+                    <th scope="col" className="px-4 py-3 font-medium">{au.colLaw}</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[var(--border)]">
+                  {AUTHORITIES.map((a, i) => (
+                    <tr key={a.law} className={i === 0 ? 'bg-[var(--highlight)]/40' : undefined}>
+                      <th scope="row" className="px-4 py-3 font-semibold text-[var(--text-heading)]">{a.country[lang]}</th>
+                      <td className="px-4 py-3 text-[var(--text)]">{a.authority}</td>
+                      <td className="px-4 py-3 text-[var(--text-muted)]">{a.law}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="mt-3 text-xs text-[var(--text-muted)]">{au.disclaimer}</p>
+          </div>
+        </div>
       </section>
 
       <LetterGenerator lang={lang} />

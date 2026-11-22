@@ -179,6 +179,7 @@ export const LetterGenerator: React.FC<{ lang: Lang }> = ({ lang }) => {
           >
             {letter}
           </pre>
+          <p className="mt-3 text-sm leading-relaxed text-[var(--text-muted)]">{s.lawNote}</p>
           {s.langNote && <p className="mt-2 text-xs text-[var(--text-muted)]">{s.langNote}</p>}
         </div>
       </div>

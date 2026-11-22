@@ -313,12 +313,18 @@ const Author: React.FC<{ lang: Lang }> = ({ lang }) => {
     <section className="py-16 sm:py-20">
       <Reveal>
         <div className="grid gap-8 lg:grid-cols-[auto_1fr] lg:gap-12">
-          <div
-            className="flex h-28 w-28 items-center justify-center rounded-full border border-[var(--rule)] font-display text-4xl font-semibold text-[var(--text-heading)]"
-            aria-hidden="true"
-          >
-            MB
-          </div>
+          <picture className="block h-28 w-28 shrink-0 overflow-hidden rounded-full border border-[var(--rule)] bg-[var(--bg-elevated)]">
+            <source srcSet="./malick-ba.webp" type="image/webp" />
+            <img
+              src="./malick-ba.jpg"
+              alt={AUTHOR.name}
+              width={112}
+              height={112}
+              loading="lazy"
+              decoding="async"
+              className="h-full w-full object-cover object-center"
+            />
+          </picture>
           <div>
             <p className="eyebrow">{h.authorEyebrow}</p>
             <h2 className="mt-3 text-4xl font-semibold text-[var(--text-heading)]">{AUTHOR.name}</h2>

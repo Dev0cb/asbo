@@ -120,8 +120,14 @@ platform/
   (mobile-money fraud, WhatsApp account theft, young under-prepared users,
   little-known rights) — not by others' shortcomings.
 - **Keep CDP visibility low** (owner wants a future partnership, not free
-  promotion): no CDP CTA/links/contact card. Refer neutrally to "l'autorité de
-  protection des données personnelles" only where legally useful.
+  promotion): no CDP CTA, link or contact card. Naming the CDP is OK where it
+  is legally useful (owner, 2026-11-22): in generated letters, in step 3 of
+  the Rights page and in the "Une autorité par pays" table (`AUTHORITIES` in
+  data/letters.ts — one authority + one law per country; keep it indicative).
+- Wording: "Formé en Systèmes d'Information Répartis (Master 2, UCAD)", never
+  "Titulaire de". Certs: GDPR & Data Privacy, Data Governance, Data Literacy
+  (DataCamp), Digital Security & Secure Online Practices (Code for Africa).
+- Author photo: `public/malick-ba.webp|jpg` (320px, EXIF stripped).
 - Do NOT rehost CDP's PDF templates (copyright unclear, signed URLs expire).
   ASBO's own letters live in `data/letters.ts` (art. 62 access, art. 68
   objection, art. 69 rectification/deletion of loi 2008-12 du 25/01/2008).
