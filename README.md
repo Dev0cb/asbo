@@ -1,6 +1,6 @@
-# ASBO — Aar Seu Bopp Online
+# ASBO — Aar Sa Bopp Online
 
-**ASBO Platform** (« aar seu bopp » : *se protéger*, en wolof) est une
+**ASBO Platform** (« aar sa bopp » : *se protéger*, en wolof) est une
 Progressive Web App gratuite d'éducation à la sécurité numérique, conçue au
 Sénégal pour l'Afrique : déjouer les arnaques, protéger ses comptes et faire
 valoir ses droits sur ses données personnelles.

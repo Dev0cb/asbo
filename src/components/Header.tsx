@@ -46,13 +46,13 @@ export const Header: React.FC<Props> = ({ lang, onToggleLang, theme, onToggleThe
             navigate('/');
           }}
           className="flex h-11 items-center gap-2.5 text-[var(--text-heading)]"
-          aria-label="ASBO, Aar Seu Bopp Online"
+          aria-label="ASBO, Aar Sa Bopp Online"
         >
           <AsboMark className="h-8 w-8" />
           <span className="flex flex-col leading-none">
             <span className="text-[17px] font-bold tracking-tight">ASBO</span>
             <span className="mt-1 hidden font-mono text-xs uppercase tracking-[0.16em] text-[var(--text-muted)] sm:block">
-              Aar Seu Bopp Online
+              Aar Sa Bopp Online
             </span>
           </span>
         </a>

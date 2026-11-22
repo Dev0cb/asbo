@@ -76,7 +76,7 @@ const App: React.FC = () => {
     document.documentElement.lang = lang;
     const section = route.path[0] ?? '';
     const sectionTitle = TITLES[lang][section] ?? TITLES[lang][''];
-    document.title = section ? `${sectionTitle} · ASBO — Aar Seu Bopp Online` : 'ASBO — Aar Seu Bopp Online · Se protéger en ligne';
+    document.title = section ? `${sectionTitle} · ASBO — Aar Sa Bopp Online` : 'ASBO — Aar Sa Bopp Online · Se protéger en ligne';
   }, [lang, route]);
 
   const toggleLang = useCallback(() => {

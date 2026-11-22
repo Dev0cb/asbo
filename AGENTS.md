@@ -1,22 +1,22 @@
-# ASBO (Aar Seu Bopp Online) — Agent Handoff Report
+# ASBO (Aar Sa Bopp Online) — Agent Handoff Report
 
 Complete context for continuing development on this project. Read this file
 first, then `README.md`.
 
 ## What this is
 
-**ASBO Platform** — *Aar Seu Bopp Online* (Wolof: "protect yourself online"; brand spelling chosen by the owner) — is a free Progressive Web App that teaches every Senegalese
+**ASBO Platform** — *Aar Sa Bopp Online* (Wolof: "protect yourself online") — is a free Progressive Web App that teaches every Senegalese
 user to protect their personal data and browse safely online. It is an
 independent civic initiative by **Malick BA** (software/data/AI engineer,
 DevSecOps practitioner) — <https://malickba.me>.
 
 Live URL: **https://asbo.malickba.me** (GitHub Pages, custom domain; formerly securite.malickba.me).
-Repo: **https://github.com/Dev0cb/securite** (public, `main` branch).
+Repo: **https://github.com/Dev0cb/asbo** (public, `main` branch; renamed from `securite` on 2026-11-22 — GitHub redirects the old URL).
 It is a *separate* repo from the portfolio repo
 (`malick-ba---devsecops---software-engineer-portfolio`) — do NOT merge them.
 The `platform/` folder inside the portfolio checkout is a git-ignored copy;
-the canonical source is the `Dev0cb/securite` repo. Keep them in sync by
-working in `platform/` and pushing to the `securite` remote.
+the canonical source is the `Dev0cb/asbo` repo. Keep them in sync by
+working in `platform/` and pushing to the `asbo` remote.
 
 ## Stack
 
@@ -109,7 +109,7 @@ platform/
 
 ## Brand, voice & positioning (owner's instructions, 2026-11-22)
 
-- Name: **ASBO** / **Aar Seu Bopp Online** / "ASBO Platform". Logo = keyhole
+- Name: **ASBO** / **Aar Sa Bopp Online** / "ASBO Platform". Logo = keyhole
   that is also a person (`AsboMark` in icons.tsx, `public/favicon.svg`).
 - Personal branding: Malick BA — Senegalese software engineer specialised in
   distributed systems (Master 2 Systèmes d'Information Répartis, UCAD);
@@ -189,16 +189,16 @@ platform/
 
 - GitHub Actions `.github/workflows/deploy.yml`: `npm ci` → `vite build`
   (with `vars.VITE_SUPABASE_*`) → `upload-pages-artifact` → `deploy-pages`.
-- GitHub Pages: custom domain `securite.malickba.me`, `build_type=workflow`,
+- GitHub Pages: custom domain `asbo.malickba.me`, `build_type=workflow`,
   `https_enforced` pending cert provisioning (automatic once GitHub issues
-  the Let's Encrypt cert — check `gh api repos/Dev0cb/securite/pages`).
-- DNS (Namecheap): `securite` CNAME → `dev0cb.github.io` ✅ done.
+  the Let's Encrypt cert — check `gh api repos/Dev0cb/asbo/pages`).
+- DNS (Namecheap): `asbo` CNAME → `dev0cb.github.io` ✅ done (old `securite` CNAME may still exist; GitHub serves only one custom domain).
 - `base: './'` in `vite.config.ts` keeps the build portable (subdomain root
   or sub-path). Do not change to `/` unless the domain setup changes.
 
 ## Known state / pending
 
-- HTTPS cert: if `gh api repos/Dev0cb/securite/pages` has no
+- HTTPS cert: if `gh api repos/Dev0cb/asbo/pages` has no
   `https_certificate` field, GitHub never requested one — remove and re-add
   the custom domain to trigger it (see Deployment).
 - No tests yet — verification is `tsc --noEmit` + `vite build` + visual

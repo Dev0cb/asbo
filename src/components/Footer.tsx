@@ -30,7 +30,7 @@ export const Footer: React.FC<{ lang: Lang }> = ({ lang }) => {
               <div className="leading-none">
                 <p className="text-lg font-bold text-[var(--text-heading)]">ASBO</p>
                 <p className="mt-1 font-mono text-xs uppercase tracking-[0.16em] text-[var(--text-muted)]">
-                  Aar Seu Bopp Online
+                  Aar Sa Bopp Online
                 </p>
               </div>
             </div>

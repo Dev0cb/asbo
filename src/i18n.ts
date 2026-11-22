@@ -26,7 +26,7 @@ export const STR = {
     },
     home: {
       badge: 'Initiative indépendante · 100 % gratuite',
-      meaning: '« Aar seu bopp » signifie « se protéger » en wolof.',
+      meaning: '« Aar sa bopp » signifie « se protéger » en wolof.',
       titleA: 'Se protéger en ligne,',
       titleB: 'ça s\'apprend.',
       sub: 'ASBO apprend à chaque Sénégalais, et à chaque Africain, à déjouer les arnaques, protéger ses comptes et faire valoir ses droits sur ses données. En langage simple, sans inscription, sur n\'importe quel téléphone.',
@@ -80,7 +80,7 @@ export const STR = {
       authorText: 'Titulaire d\'un Master 2 en Systèmes d\'Information Répartis (UCAD), Malick BA conçoit des plateformes logicielles et de données sécurisées dès la conception. Formateur auprès de communautés tech et étudiantes, il a créé ASBO pour mettre son expertise en protection des données au service du plus grand nombre.',
       authorCerts: 'Certifications',
       authorCta: 'Découvrir son parcours',
-      footerNote: 'ASBO, pour Aar Seu Bopp Online, est une initiative citoyenne indépendante d\'éducation à la sécurité numérique, conçue au Sénégal pour l\'Afrique.',
+      footerNote: 'ASBO, pour Aar Sa Bopp Online, est une initiative citoyenne indépendante d\'éducation à la sécurité numérique, conçue au Sénégal pour l\'Afrique.',
       tickerLabel: 'Arnaques qui circulent en ce moment',
       ticker: [
         '« Votre compte Wave sera bloqué, envoyez votre code PIN »',
@@ -239,7 +239,7 @@ export const STR = {
     },
     home: {
       badge: 'Independent initiative · 100% free',
-      meaning: '"Aar seu bopp" means "protect yourself" in Wolof.',
+      meaning: '"Aar sa bopp" means "protect yourself" in Wolof.',
       titleA: 'Staying safe online',
       titleB: 'can be learned.',
       sub: 'ASBO teaches every Senegalese, and every African, to beat scams, protect their accounts and exercise their rights over their data. In plain language, no sign-up, on any phone.',
@@ -293,7 +293,7 @@ export const STR = {
       authorText: 'Holder of a Master 2 in Distributed Information Systems (UCAD), Malick BA designs software and data platforms that are secure by design. A trainer for tech and student communities, he created ASBO to put his data-protection expertise at the service of everyone.',
       authorCerts: 'Certifications',
       authorCta: 'Explore his work',
-      footerNote: 'ASBO, short for Aar Seu Bopp Online, is an independent civic initiative for digital-safety education, designed in Senegal for Africa.',
+      footerNote: 'ASBO, short for Aar Sa Bopp Online, is an independent civic initiative for digital-safety education, designed in Senegal for Africa.',
       tickerLabel: 'Scams going around right now',
       ticker: [
         '"Your Wave account will be blocked, send your PIN"',

@@ -17,6 +17,6 @@ export const PLATFORM_URL = 'https://asbo.malickba.me';
 
 export const BRAND = {
   name: 'ASBO',
-  full: 'Aar Seu Bopp Online',
+  full: 'Aar Sa Bopp Online',
   platform: 'ASBO Platform',
 };
