@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { STR, type Lang } from '../i18n';
 import { track } from '../lib/stats';
 import { IconScale, IconAlert, IconExternal } from './icons';
@@ -12,14 +12,12 @@ const RIGHT_KEYS = ['r1', 'r2', 'r3', 'r4'] as const;
 export const RightsPage: React.FC<Props> = ({ lang }) => {
   const t = STR[lang];
 
-  useEffect(() => {
-    track('page_view', { page: 'rights' });
-  }, []);
-
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
-      <div className="flex items-center gap-3">
-        <IconScale className="h-9 w-9 text-[var(--color-accent)]" />
+      <div className="flex items-center gap-4">
+        <span className="icon-tile h-12 w-12 bg-[var(--color-accent)]/10 text-[var(--color-accent)] sm:h-14 sm:w-14">
+          <IconScale className="h-7 w-7 sm:h-8 sm:w-8" />
+        </span>
         <h1 className="text-3xl font-extrabold tracking-tight text-[var(--text-heading)] sm:text-4xl">
           {t.rights.title}
         </h1>

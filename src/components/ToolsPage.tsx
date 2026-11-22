@@ -14,10 +14,6 @@ export const ToolsPage: React.FC<Props> = ({ lang }) => {
   const t = STR[lang];
   const [tab, setTab] = useState<Tab>('quiz');
 
-  useEffect(() => {
-    track('page_view', { page: 'tools' });
-  }, []);
-
   const tabs: { id: Tab; label: string }[] = [
     { id: 'quiz', label: t.tools.quizTab },
     { id: 'checker', label: t.tools.checkerTab },
@@ -31,14 +27,14 @@ export const ToolsPage: React.FC<Props> = ({ lang }) => {
       </h1>
       <p className="mt-3 max-w-2xl text-[var(--text-muted)]">{t.tools.intro}</p>
 
-      <div className="mt-6 flex gap-2 overflow-x-auto pb-1" role="tablist">
+      <div className="mt-6 grid grid-cols-3 gap-2 sm:flex" role="tablist">
         {tabs.map((tb) => (
           <button
             key={tb.id}
             role="tab"
             aria-selected={tab === tb.id}
             onClick={() => setTab(tb.id)}
-            className={`whitespace-nowrap rounded-lg px-4 py-2.5 text-sm font-medium transition-colors ${
+            className={`rounded-lg px-2 py-2.5 text-center text-xs font-medium leading-tight transition-colors sm:whitespace-nowrap sm:px-4 sm:text-sm ${
               tab === tb.id
                 ? 'bg-[var(--color-accent)] text-[#1a1207]'
                 : 'border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-heading)]'

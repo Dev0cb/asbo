@@ -45,7 +45,15 @@ repo **variables** (already set). `.env.example` documents them.
 
 ## ⚠️ Critical gotcha — Tailwind v4
 
-**`@apply` inside `@layer` is NOT expanded by Tailwind v4.** Custom classes
+**`postcss.config.mjs` (with `@tailwindcss/postcss`) is REQUIRED.** Without
+it, `@import "tailwindcss"` is inlined raw, the built CSS contains a literal
+`@tailwind utilities` and **zero utility classes** — every `flex`, `grid`,
+`px-4`, `max-w-6xl` is ignored and the site looks like raw HTML. This was the
+real root cause of the "site looks broken" reports (fixed 2026-11-22).
+Quick check after a build: `grep -c '@tailwind' dist/assets/*.css` must be 0
+and `grep -c 'max-w-6xl' dist/assets/*.css` must be ≥ 1.
+
+Also: **`@apply` inside `@layer` is NOT expanded by Tailwind v4.** Custom classes
 must be plain CSS. `src/index.css` documents this. If UI looks "unstyled",
 check the built CSS for literal `@apply` — that was the bug that made the
 site look broken. All design tokens are CSS vars (`--bg`, `--bg-card`,
@@ -81,7 +89,7 @@ platform/
 │       ├── RightsPage.tsx  # Senegal law 2008-12 + CDP contact card
 │       ├── AboutPage.tsx   # author card → malickba.me / LinkedIn / GitHub
 │       ├── AdminPage.tsx   # Supabase auth dashboard + demo fallback
-│       ├── Reveal.tsx      # IntersectionObserver reveal + 1.2s fallback
+│       ├── Reveal.tsx      # visible by default; only below-fold items get .reveal-pending
 │       └── icons.tsx       # SVG icon set + GUIDE_ICONS map
 └── supabase/
     ├── schema.sql          # canonical schema (events table + RLS + view)
@@ -142,11 +150,17 @@ platform/
 
 ## Known state / pending
 
-- HTTPS cert: provisioning by GitHub (was pending at last check; HTTP works).
-- No tests yet — verification is `tsc --noEmit` + `vite build` + manual
-  smoke via headless Chrome (`google-chrome --headless=new --dump-dom`).
-- Images/screenshots can't be reviewed by the agent (no vision) — ask the
-  user for descriptions or specific feedback when UI issues are reported.
+- HTTPS cert: if `gh api repos/Dev0cb/securite/pages` has no
+  `https_certificate` field, GitHub never requested one — remove and re-add
+  the custom domain to trigger it (see Deployment).
+- No tests yet — verification is `tsc --noEmit` + `vite build` + visual
+  check with headless Chrome screenshots, e.g.
+  `google-chrome --headless=new --hide-scrollbars --virtual-time-budget=5000
+  --window-size=390,2400 --screenshot=out.png "http://localhost:4173/#/guides"`
+  after `npx vite preview --port 4173`. Always check mobile (390px) AND
+  desktop (1366px) and look at the screenshots.
+- Analytics: `page_view` is tracked ONLY in `App.tsx` (on hash change). Do
+  not add per-page `track('page_view')` effects — that double-counted.
 
 ## Roadmap ideas (discussed with owner)
 
@@ -161,8 +175,7 @@ platform/
 
 ## Working agreements
 
-- Commit style: short imperative subject + `Generated with [Devin]` trailer
-  (see `git log`). The portfolio repo uses the same convention.
+- Commit style: short imperative subject (see `git log`). The portfolio repo uses the same convention.
 - Never commit `.env.local` or secrets; anon key is public-by-design but
   keep service-role keys out of the repo entirely.
 - After any UI change: bump `CACHE` in `public/sw.js`, rebuild, push,

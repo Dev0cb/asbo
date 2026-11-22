@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { STR, type Lang } from '../i18n';
 import { GUIDES } from '../data/guides';
 import { track } from '../lib/stats';
@@ -38,16 +38,12 @@ const ICON_COLORS: Record<string, string> = {
 export const Home: React.FC<Props> = ({ lang }) => {
   const t = STR[lang];
 
-  useEffect(() => {
-    track('page_view', { page: 'home' });
-  }, []);
-
   const guides = GUIDES[lang];
 
   return (
     <div className="mx-auto max-w-6xl px-4 sm:px-6">
       {/* ============ HERO ============ */}
-      <section className="relative overflow-hidden pb-14 pt-16 sm:pt-24">
+      <section className="relative pb-14 pt-16 sm:pt-24">
         <div className="hero-bg" aria-hidden="true" />
         <div className="relative">
           <Reveal>
@@ -56,7 +52,7 @@ export const Home: React.FC<Props> = ({ lang }) => {
                 <span className="pulse-dot mr-1.5 inline-block h-2 w-2 rounded-full bg-[var(--color-accent)]" />
                 {t.home.badge}
               </span>
-              <span className="chip">🇸🇳 {lang === 'fr' ? 'Fait au Sénégal' : 'Made in Senegal'}</span>
+              <span className="chip">🇸🇳 {t.home.madeIn}</span>
             </div>
           </Reveal>
           <Reveal delay={80}>
@@ -100,10 +96,10 @@ export const Home: React.FC<Props> = ({ lang }) => {
           <Reveal delay={320}>
             <ul className="mt-12 grid gap-4 sm:grid-cols-3">
               {[
-                { icon: IconBook, label: t.home.stats1, color: '#38bdf8' },
-                { icon: IconTool, label: t.home.stats2, color: '#34d399' },
-                { icon: IconShield, label: t.home.stats3, color: '#f59e0b' },
-              ].map(({ icon: Icon, label, color }) => (
+                { icon: IconBook, value: String(guides.length), label: t.home.stats1, color: '#38bdf8' },
+                { icon: IconTool, value: '3', label: t.home.stats2, color: '#34d399' },
+                { icon: IconShield, value: '100 %', label: t.home.stats3, color: '#f59e0b' },
+              ].map(({ icon: Icon, value, label, color }) => (
                 <li key={label} className="card flex items-center gap-3.5 px-5 py-4">
                   <span
                     className="icon-tile h-10 w-10"
@@ -111,7 +107,10 @@ export const Home: React.FC<Props> = ({ lang }) => {
                   >
                     <Icon className="h-5 w-5" />
                   </span>
-                  <span className="text-sm font-medium text-[var(--text)]">{label}</span>
+                  <span className="text-sm font-medium text-[var(--text)]">
+                    <strong className="mr-1.5 text-xl font-extrabold text-[var(--text-heading)]">{value}</strong>
+                    {label}
+                  </span>
                 </li>
               ))}
             </ul>
@@ -219,7 +218,7 @@ export const Home: React.FC<Props> = ({ lang }) => {
                     {g.intro}
                   </p>
                   <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--color-accent)]">
-                    {lang === 'fr' ? 'Lire le guide' : 'Read guide'}
+                    {t.home.readGuide}
                     <IconArrow className="h-4 w-4 transition-transform group-hover:translate-x-1.5" />
                   </span>
                 </a>

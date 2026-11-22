@@ -49,10 +49,6 @@ const GuidesIndex: React.FC<{ lang: Lang; guides: Guide[] }> = ({ lang, guides }
   const t = STR[lang];
   const [q, setQ] = useState('');
 
-  useEffect(() => {
-    track('page_view', { page: 'guides' });
-  }, []);
-
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
     if (!needle) return guides;
@@ -119,7 +115,7 @@ const GuidesIndex: React.FC<{ lang: Lang; guides: Guide[] }> = ({ lang, guides }
                   {g.intro}
                 </p>
                 <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--color-accent)]">
-                  {lang === 'fr' ? 'Lire le guide' : 'Read guide'}
+                  {t.home.readGuide}
                   <IconArrow className="h-4 w-4 transition-transform group-hover:translate-x-1.5" />
                 </span>
               </a>
@@ -149,7 +145,11 @@ const GuideArticle: React.FC<{ lang: Lang; guide: Guide; guides: Guide[] }> = ({
   const idx = guides.findIndex((g) => g.slug === guide.slug);
   const prev = guides[(idx - 1 + guides.length) % guides.length];
   const next = guides[(idx + 1) % guides.length];
-  const related = guides.filter((g) => g.slug !== guide.slug).slice(0, 3);
+  // Rotate through the catalogue (skipping prev/next, already linked above)
+  // so every guide gets surfaced instead of always the first three.
+  const related = [2, 3, 4]
+    .map((offset) => guides[(idx + offset) % guides.length])
+    .filter((g) => g.slug !== guide.slug && g.slug !== prev.slug);
   const Icon = GUIDE_ICONS[guide.icon] || IconCheck;
 
   return (

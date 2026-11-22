@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { STR, type Lang } from '../i18n';
 import { AUTHOR } from '../config';
 import { track } from '../lib/stats';
@@ -10,10 +10,6 @@ interface Props {
 
 export const AboutPage: React.FC<Props> = ({ lang }) => {
   const t = STR[lang];
-
-  useEffect(() => {
-    track('page_view', { page: 'about' });
-  }, []);
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">

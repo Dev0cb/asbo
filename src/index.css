@@ -39,6 +39,11 @@
     scroll-behavior: smooth;
   }
 
+  html,
+  body {
+    overflow-x: clip;
+  }
+
   body {
     background-color: var(--bg);
     color: var(--text);
@@ -160,11 +165,20 @@
 
 /* ---------- Decorative ---------- */
 
+/* Full-bleed: escape the max-width column so glows aren't clipped
+   into hard vertical edges. body has overflow-x: clip. */
 .hero-bg {
   position: absolute;
-  inset: 0;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);
   overflow: hidden;
   pointer-events: none;
+  /* Fade out at the bottom so the glow never ends on a hard line. */
+  -webkit-mask-image: linear-gradient(#000 60%, transparent);
+  mask-image: linear-gradient(#000 60%, transparent);
 }
 .hero-bg::before,
 .hero-bg::after {
@@ -232,18 +246,17 @@
   to { transform: translateX(-50%); }
 }
 
-/* Scroll reveal */
+/* Scroll reveal — visible by default; JS adds .reveal-pending only to
+   elements that start below the fold (see Reveal.tsx). */
 .reveal {
-  opacity: 0;
-  transform: translateY(18px);
   transition: opacity 0.55s ease, transform 0.55s ease;
 }
-.reveal.is-visible {
-  opacity: 1;
-  transform: translateY(0);
+.reveal.reveal-pending {
+  opacity: 0;
+  transform: translateY(18px);
 }
 @media (prefers-reduced-motion: reduce) {
-  .reveal { opacity: 1; transform: none; transition: none; }
+  .reveal { transition: none; }
   .hero-bg::before, .hero-bg::after, .ticker-track { animation: none; }
 }
 
