@@ -244,6 +244,34 @@ for Senegal and the Sécurité design system:
 - Event `lab_complete` `{lab, score?, max?, lang}` (no DB constraint on type).
 - Lab strings live in `data/labs.ts` (`LAB_STR`) to keep `i18n.ts` < 800 lines.
 
+## On-device AI (LLM in the browser)
+
+- Library: `@huggingface/transformers` 4.3.2 (pinned). Model:
+  `onnx-community/Qwen2.5-0.5B-Instruct` — q4f16 on WebGPU (~480 MB) when
+  the GPU supports `shader-f16`, otherwise int8 on WASM (~510 MB). Constants
+  in `src/lib/llm/protocol.ts`.
+- `src/lib/llm/worker.ts` runs the model in a module worker (page never
+  freezes); `engine.ts` is the page-side store (status, progress, streaming,
+  interrupt); `prompts.ts` builds grounded prompts.
+- **Never auto-download.** `components/tools/LocalAI.tsx` (`LocalAIGate`)
+  asks first, shows the size, warns on data-saver / low memory, then caches
+  (browser Cache Storage; `asbo-llm-cached` flag) so it works offline.
+- Users' text never leaves the device. Weights come from Hugging Face; Vite
+  bundles the ONNX runtime wasm (`assets/ort-wasm-*.wasm`, ~6.7 MB gzip).
+- Tools using it: scam checker "Analyse approfondie" (`tools/CheckerAI.tsx`,
+  grounded on the rule-based signals) and "Assistant IA"
+  (`tools/AssistantLab.tsx`, keyword retrieval over the 9 guides; shows
+  the guides used as sources). A 0.5B model is small: keep prompts short,
+  grounded and in the user's language; always show the "AI can be wrong"
+  disclaimer.
+
+## "Vrai ou arnaque ?" (phone simulator)
+
+- Scenarios in `src/data/phishing.ts` (18, FR/EN, per-scenario `clues`
+  with a `target` that is outlined + numbered on the phone after answering).
+- `components/tools/phone/Phone.tsx` draws SMS / WhatsApp / Gmail-like
+  e-mail / Messenger / Facebook post screens; order reshuffled each game.
+
 ## Roadmap ideas (discussed with owner)
 
 1. Open Graph image + Google Search Console sitemap submission (SEO).

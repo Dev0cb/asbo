@@ -4,223 +4,7 @@
 // for everyday Senegalese life: Wave, Orange Money, WhatsApp, SENELEC…
 import type { Lang } from '../i18n';
 import type { FindingKey, TimeUnit } from '../lib/password';
-
-/* ============================== Phishing trainer ============================== */
-
-export type Channel = 'sms' | 'whatsapp' | 'email';
-
-export interface PhishingScenario {
-  channel: Channel;
-  from: string;
-  subject?: string;
-  body: string;
-  isScam: boolean;
-  clues: string[];
-  explanation: string;
-}
-
-export const PHISHING: Record<Lang, PhishingScenario[]> = {
-  fr: [
-    {
-      channel: 'sms',
-      from: 'WAVE-INFO',
-      body: 'Wave : votre compte est suspendu suite à une activité suspecte. Confirmez votre identité sous 24h sur wave-sn-securite.com/verif sinon votre solde sera bloqué.',
-      isScam: true,
-      clues: [
-        'Le lien « wave-sn-securite.com » n\'est pas le site officiel de Wave (wave.com).',
-        'Urgence et menace : « sous 24h », « solde bloqué ».',
-        'Wave ne vous demande jamais de vous identifier via un lien reçu par SMS.',
-      ],
-      explanation: 'C\'est un hameçonnage classique. Le nom d\'expéditeur d\'un SMS se falsifie facilement. Ouvrez toujours l\'application Wave vous-même pour vérifier votre compte.',
-    },
-    {
-      channel: 'sms',
-      from: 'OrangeMoney',
-      body: 'Vous avez reçu 15 000 FCFA du 77 XXX XX 12. Nouveau solde : 23 450 FCFA. Réf : MP2611.1834.B47201.',
-      isScam: false,
-      clues: [
-        'Aucun lien, aucune demande d\'action, aucun code demandé.',
-        'Simple information, format habituel des notifications Orange Money.',
-        'Réflexe : confirmez quand même le solde dans l\'application (#144#) avant tout.',
-      ],
-      explanation: 'Ce message est légitime. Mais attention à l\'arnaque qui suit souvent : un faux SMS de ce type, puis un appel « je me suis trompé, renvoie-moi l\'argent ». Vérifiez toujours votre vrai solde.',
-    },
-    {
-      channel: 'whatsapp',
-      from: '+221 78 XXX XX 41 (inconnu)',
-      body: 'Maman c\'est moi, mon téléphone est tombé dans l\'eau, voici mon nouveau numéro. J\'ai un souci urgent, envoie-moi 50 000 F par Wave stp, je t\'explique ce soir 🙏',
-      isScam: true,
-      clues: [
-        'Numéro inconnu qui prétend être un proche.',
-        'Demande d\'argent urgente, sans pouvoir appeler.',
-        '« Je t\'explique plus tard » : empêche toute vérification.',
-      ],
-      explanation: 'C\'est l\'arnaque au faux proche. Appelez l\'ancien numéro de la personne ou posez une question que seul votre vrai proche connaît.',
-    },
-    {
-      channel: 'email',
-      from: 'no-reply@accounts.google.com',
-      subject: 'Alerte de sécurité',
-      body: 'Nouvelle connexion sur Windows. Nous avons détecté une nouvelle connexion à votre compte Google. Si c\'était vous, vous n\'avez rien à faire. Sinon, nous vous aiderons à sécuriser votre compte.\n\nVérifier l\'activité',
-      isScam: false,
-      clues: [
-        'Adresse officielle @accounts.google.com.',
-        'Pas de menace, pas d\'urgence, pas de mot de passe demandé.',
-        'Bon réflexe : vérifiez dans l\'application Gmail, pas via le bouton.',
-      ],
-      explanation: 'Cet e-mail est légitime : Google envoie ce type d\'alerte. Pour vérifier, allez vous-même dans « Compte Google › Sécurité » plutôt que de cliquer.',
-    },
-    {
-      channel: 'email',
-      from: 'senelec-facturation@gmail.com',
-      subject: 'URGENT : coupure de courant ce soir',
-      body: 'Cher client, votre facture est impayée. Sans régularisation aujourd\'hui, votre compteur sera coupé à 18h.\n\nTéléchargez votre facture et payez ici :\n📎 Facture_Senelec.apk',
-      isScam: true,
-      clues: [
-        'Une entreprise n\'écrit pas depuis une adresse @gmail.com.',
-        'Menace de coupure le jour même.',
-        'Pièce jointe .apk : c\'est une application Android, pas une facture. Elle peut prendre le contrôle du téléphone.',
-      ],
-      explanation: 'Arnaque dangereuse : le fichier .apk installe un logiciel espion. Une facture est un PDF. Payez uniquement via les canaux officiels (Woyofal, application SENELEC, agences).',
-    },
-    {
-      channel: 'whatsapp',
-      from: 'Cheikh (contact enregistré)',
-      body: 'Salut ! Je t\'ai envoyé un code par SMS par erreur, je l\'attendais pour mon compte. Tu peux me le renvoyer vite stp ? 6 chiffres',
-      isScam: true,
-      clues: [
-        'Le code SMS que vous avez reçu sert à connecter VOTRE WhatsApp sur un autre téléphone.',
-        'Le compte de votre ami a probablement déjà été piraté.',
-        'Personne n\'envoie « par erreur » un code de vérification à votre numéro.',
-      ],
-      explanation: 'C\'est la technique n°1 de vol de comptes WhatsApp au Sénégal. Ne partagez jamais un code reçu par SMS, même avec un proche. Activez la « Validation en deux étapes » dans WhatsApp.',
-    },
-    {
-      channel: 'sms',
-      from: 'Banque',
-      body: 'Paiement de 12 500 FCFA par carte ****4821 chez AUCHAN SACRE-COEUR le 21/11 à 18:42. Si vous n\'êtes pas à l\'origine de cette opération, appelez le numéro au dos de votre carte.',
-      isScam: false,
-      clues: [
-        'Aucun lien à cliquer, aucun code demandé.',
-        'Vous renvoie vers le numéro au dos de VOTRE carte, pas vers un numéro dans le message.',
-        'Information précise et vérifiable dans votre relevé.',
-      ],
-      explanation: 'Notification légitime. Le bon réflexe en cas de doute est justement celui proposé : appeler le numéro imprimé sur votre carte.',
-    },
-    {
-      channel: 'whatsapp',
-      from: 'Promo Anniversaire 🎉',
-      body: 'Félicitations ! Votre numéro a gagné 1 000 000 FCFA au tirage anniversaire de votre opérateur. Pour recevoir votre gain, envoyez 5 000 F de frais de dossier au 76 XXX XX 09.',
-      isScam: true,
-      clues: [
-        'Vous n\'avez participé à aucun jeu.',
-        'Il faut payer pour recevoir un gain : c\'est toujours une arnaque.',
-        'Paiement vers un numéro personnel, pas vers l\'opérateur.',
-      ],
-      explanation: 'Arnaque aux « frais de dossier ». Un vrai gain ne demande jamais de payer d\'abord. Bloquez et signalez le numéro.',
-    },
-  ],
-  en: [
-    {
-      channel: 'sms',
-      from: 'WAVE-INFO',
-      body: 'Wave: your account has been suspended due to suspicious activity. Confirm your identity within 24h at wave-sn-securite.com/verif or your balance will be frozen.',
-      isScam: true,
-      clues: [
-        'The link "wave-sn-securite.com" is not Wave\'s official site (wave.com).',
-        'Urgency and threats: "within 24h", "balance frozen".',
-        'Wave never asks you to identify yourself through a link received by SMS.',
-      ],
-      explanation: 'Classic phishing. An SMS sender name is easy to fake. Always open the Wave app yourself to check your account.',
-    },
-    {
-      channel: 'sms',
-      from: 'OrangeMoney',
-      body: 'You received 15,000 FCFA from 77 XXX XX 12. New balance: 23,450 FCFA. Ref: MP2611.1834.B47201.',
-      isScam: false,
-      clues: [
-        'No link, no action requested, no code asked for.',
-        'Plain information in the usual Orange Money notification format.',
-        'Reflex: still confirm the balance in the app (#144#) before anything else.',
-      ],
-      explanation: 'This message is legitimate. But beware the scam that often follows: a fake SMS like this, then a call "I sent it by mistake, send it back". Always check your real balance.',
-    },
-    {
-      channel: 'whatsapp',
-      from: '+221 78 XXX XX 41 (unknown)',
-      body: 'Mum it\'s me, my phone fell in water, this is my new number. I have an urgent problem, please send me 50,000 F by Wave, I\'ll explain tonight 🙏',
-      isScam: true,
-      clues: [
-        'Unknown number claiming to be a relative.',
-        'Urgent money request, with no way to call.',
-        '"I\'ll explain later": prevents any verification.',
-      ],
-      explanation: 'This is the fake-relative scam. Call the person\'s old number or ask a question only your real relative would know.',
-    },
-    {
-      channel: 'email',
-      from: 'no-reply@accounts.google.com',
-      subject: 'Security alert',
-      body: 'New sign-in on Windows. We noticed a new sign-in to your Google Account. If this was you, you don\'t need to do anything. If not, we\'ll help you secure your account.\n\nCheck activity',
-      isScam: false,
-      clues: [
-        'Official address @accounts.google.com.',
-        'No threat, no urgency, no password requested.',
-        'Good reflex: check in the Gmail app, not through the button.',
-      ],
-      explanation: 'This email is legitimate: Google sends this kind of alert. To check, go to "Google Account › Security" yourself rather than clicking.',
-    },
-    {
-      channel: 'email',
-      from: 'senelec-facturation@gmail.com',
-      subject: 'URGENT: power cut tonight',
-      body: 'Dear customer, your bill is unpaid. Without payment today, your meter will be cut at 6pm.\n\nDownload your bill and pay here:\n📎 Facture_Senelec.apk',
-      isScam: true,
-      clues: [
-        'A company does not write from a @gmail.com address.',
-        'Threat of a same-day power cut.',
-        '.apk attachment: that is an Android app, not a bill. It can take over the phone.',
-      ],
-      explanation: 'Dangerous scam: the .apk file installs spyware. A bill is a PDF. Only pay through official channels (Woyofal, the SENELEC app, agencies).',
-    },
-    {
-      channel: 'whatsapp',
-      from: 'Cheikh (saved contact)',
-      body: 'Hi! I sent a code to you by SMS by mistake, I was waiting for it for my account. Can you send it back quickly please? 6 digits',
-      isScam: true,
-      clues: [
-        'The SMS code you received is for logging YOUR WhatsApp into another phone.',
-        'Your friend\'s account has probably already been hacked.',
-        'Nobody sends a verification code to your number "by mistake".',
-      ],
-      explanation: 'This is the #1 WhatsApp account-theft technique in Senegal. Never share a code received by SMS, even with someone close. Turn on WhatsApp "Two-step verification".',
-    },
-    {
-      channel: 'sms',
-      from: 'Bank',
-      body: 'Card payment of 12,500 FCFA with card ****4821 at AUCHAN SACRE-COEUR on 21/11 at 18:42. If you did not make this transaction, call the number on the back of your card.',
-      isScam: false,
-      clues: [
-        'No link to click, no code requested.',
-        'Points you to the number on the back of YOUR card, not to a number in the message.',
-        'Precise information you can check on your statement.',
-      ],
-      explanation: 'Legitimate notification. The right reflex when in doubt is exactly the one suggested: call the number printed on your card.',
-    },
-    {
-      channel: 'whatsapp',
-      from: 'Anniversary Promo 🎉',
-      body: 'Congratulations! Your number won 1,000,000 FCFA in your operator\'s anniversary draw. To receive your prize, send 5,000 F processing fees to 76 XXX XX 09.',
-      isScam: true,
-      clues: [
-        'You did not enter any contest.',
-        'Paying to receive a prize: always a scam.',
-        'Payment to a personal number, not to the operator.',
-      ],
-      explanation: '"Processing fee" scam. A real prize never asks you to pay first. Block and report the number.',
-    },
-  ],
-};
+import { SCENARIO_COUNT, type Channel } from './phishing';
 
 /* ============================ Footprint ("Vos données parlent") ============================ */
 
@@ -343,9 +127,9 @@ const TIME_UNITS: Record<Lang, Record<TimeUnit, string>> = {
 
 export const LAB_STR = {
   fr: {
-    channel: { sms: 'SMS', whatsapp: 'WhatsApp', email: 'E-mail' } as Record<Channel, string>,
+    channel: { sms: 'SMS', whatsapp: 'WhatsApp', email: 'E-mail', messenger: 'Messenger', facebook: 'Facebook' } as Record<Channel, string>,
     phish: {
-      intro: 'Huit messages réels ou frauduleux, tirés de situations courantes au Sénégal. À vous de juger : arnaque ou message légitime ?',
+      intro: `${SCENARIO_COUNT} messages reçus sur un vrai téléphone : SMS, WhatsApp, e-mails, Facebook et Messenger. Ils reprennent les situations les plus fréquentes au Sénégal. Arnaque ou message légitime ? Observez bien l'expéditeur, les liens et les pièces jointes.`,
       progress: 'Message',
       of: 'sur',
       from: 'De',
@@ -357,6 +141,8 @@ export const LAB_STR = {
       wasScam: 'C\'était une arnaque.',
       wasLegit: 'C\'était un message légitime.',
       clues: 'Les indices',
+      cluesHint: 'Les numéros correspondent aux zones entourées sur le téléphone.',
+      question: 'Ce message est-il une arnaque ?',
       next: 'Message suivant',
       finish: 'Voir mon résultat',
       result: 'Votre score',
@@ -425,9 +211,9 @@ export const LAB_STR = {
     quizBad: 'Mauvaise réponse',
   },
   en: {
-    channel: { sms: 'SMS', whatsapp: 'WhatsApp', email: 'Email' } as Record<Channel, string>,
+    channel: { sms: 'SMS', whatsapp: 'WhatsApp', email: 'Email', messenger: 'Messenger', facebook: 'Facebook' } as Record<Channel, string>,
     phish: {
-      intro: 'Eight real or fraudulent messages, based on common situations in Senegal. You decide: scam or legitimate?',
+      intro: `${SCENARIO_COUNT} messages received on a real phone: SMS, WhatsApp, emails, Facebook and Messenger. They mirror the most common situations in Senegal. Scam or legitimate? Look closely at the sender, the links and the attachments.`,
       progress: 'Message',
       of: 'of',
       from: 'From',
@@ -439,6 +225,8 @@ export const LAB_STR = {
       wasScam: 'It was a scam.',
       wasLegit: 'It was a legitimate message.',
       clues: 'The clues',
+      cluesHint: 'The numbers match the areas circled on the phone.',
+      question: 'Is this message a scam?',
       next: 'Next message',
       finish: 'See my result',
       result: 'Your score',

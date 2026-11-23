@@ -7,6 +7,11 @@ import { IconCheck, IconAlert, IconArrow } from './icons';
 import { PhishingTrainer } from './tools/PhishingTrainer';
 import { PasswordTester } from './tools/PasswordTester';
 import { FootprintLab } from './tools/FootprintLab';
+import { AssistantLab } from './tools/AssistantLab';
+import { CheckerAI } from './tools/CheckerAI';
+import { aiPreviewEnabled } from '../lib/llm/protocol';
+
+const AI_PREVIEW = aiPreviewEnabled();
 
 interface Props {
   lang: Lang;
@@ -18,6 +23,7 @@ const TOOL_SLUGS = {
   quiz: 'quiz',
   phishing: 'vrai-ou-arnaque',
   checker: 'detecteur',
+  assistant: 'assistant',
   password: 'mot-de-passe',
   footprint: 'vos-donnees',
   checklist: 'checklist',
@@ -27,6 +33,8 @@ type Tab = keyof typeof TOOL_SLUGS;
 
 function tabFromSlug(slug?: string): Tab {
   const found = (Object.keys(TOOL_SLUGS) as Tab[]).find((k) => TOOL_SLUGS[k] === slug);
+  // The assistant tab only exists in AI preview mode.
+  if (found === 'assistant' && !AI_PREVIEW) return 'quiz';
   return found ?? 'quiz';
 }
 
@@ -49,6 +57,7 @@ export const ToolsPage: React.FC<Props> = ({ lang, slug }) => {
     { id: 'quiz', label: t.tools.quizTab },
     { id: 'phishing', label: t.tools.phishTab },
     { id: 'checker', label: t.tools.checkerTab },
+    ...(AI_PREVIEW ? [{ id: 'assistant' as Tab, label: t.tools.aiTab }] : []),
     { id: 'password', label: t.tools.pwTab },
     { id: 'footprint', label: t.tools.fpTab },
     { id: 'checklist', label: t.tools.checkTab },
@@ -61,7 +70,7 @@ export const ToolsPage: React.FC<Props> = ({ lang, slug }) => {
       </h1>
       <p className="mt-3 max-w-2xl text-[var(--text-muted)]">{t.tools.intro}</p>
 
-      <div className="mt-6 grid grid-cols-3 gap-2 sm:grid-cols-6" role="tablist">
+      <div className={`mt-6 grid grid-cols-3 gap-2 sm:grid-cols-4 ${AI_PREVIEW ? 'lg:grid-cols-7' : 'lg:grid-cols-6'}`} role="tablist">
         {tabs.map((tb) => (
           <button
             key={tb.id}
@@ -83,6 +92,7 @@ export const ToolsPage: React.FC<Props> = ({ lang, slug }) => {
         {tab === 'quiz' && <Quiz lang={lang} />}
         {tab === 'phishing' && <PhishingTrainer lang={lang} />}
         {tab === 'checker' && <Checker lang={lang} />}
+        {tab === 'assistant' && AI_PREVIEW && <AssistantLab lang={lang} />}
         {tab === 'password' && <PasswordTester lang={lang} />}
         {tab === 'footprint' && <FootprintLab lang={lang} />}
         {tab === 'checklist' && <Checklist lang={lang} />}
@@ -326,6 +336,7 @@ const Checker: React.FC<{ lang: Lang }> = ({ lang }) => {
           </div>
         </div>
       )}
+      {result && AI_PREVIEW && <CheckerAI key={`${result.score}-${text.length}`} lang={lang} text={text} analysis={result} />}
     </div>
   );
 };

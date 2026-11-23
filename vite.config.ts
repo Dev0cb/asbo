@@ -51,6 +51,8 @@ export default defineConfig({
     host: '0.0.0.0',
   },
   plugins: [react(), cspPlugin()],
+  // The on-device LLM runs in a module worker (src/lib/llm/worker.ts).
+  worker: { format: 'es' },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),
