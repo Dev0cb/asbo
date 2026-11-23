@@ -5,10 +5,13 @@ import {
   LETTER_KINDS,
   LETTER_STR,
   buildLetter,
+  letterLanguage,
+  RIGHT_OF,
   type LetterFields,
   type LetterKind,
 } from '../data/letters';
 import { track } from '../lib/stats';
+import { useCountry } from '../lib/country';
 import { IconCheck } from './icons';
 
 const KINDS = Object.keys(LETTER_KINDS) as LetterKind[];
@@ -51,7 +54,7 @@ const Field: React.FC<FieldProps> = ({ id, label, value, onChange, placeholder, 
 );
 
 /**
- * Drafts a rights request letter (Act No. 2008-12) from a few fields.
+ * Drafts a rights request letter, based on the selected country's law.
  * Personal details live only in component state: never tracked or stored.
  */
 export const LetterGenerator: React.FC<{ lang: Lang }> = ({ lang }) => {
@@ -60,7 +63,11 @@ export const LetterGenerator: React.FC<{ lang: Lang }> = ({ lang }) => {
   const [fields, setFields] = useState<LetterFields>(EMPTY_FIELDS);
   const [copied, setCopied] = useState(false);
 
-  const letter = useMemo(() => buildLetter(kind, fields), [kind, fields]);
+  const { country } = useCountry();
+  const letter = useMemo(() => buildLetter(kind, fields, country, lang), [kind, fields, country, lang]);
+  const letterLang = letterLanguage(country, lang);
+  const lawNote = s.lawNote(country.name[lang], country.authority ? country.authority.lawShort : null);
+  const langNote = s.langNote(letterLang);
   const meta = LETTER_KINDS[kind];
 
   const update = (id: keyof LetterFields, value: string) => {
@@ -118,9 +125,11 @@ export const LetterGenerator: React.FC<{ lang: Lang }> = ({ lang }) => {
                   {LETTER_KINDS[k].label[lang]}
                   {active && <IconCheck className="h-4 w-4 shrink-0 text-[var(--accent-text)]" />}
                 </span>
-                <span className="mt-1 font-mono text-xs uppercase tracking-wider text-[var(--text-muted)]">
-                  {LETTER_KINDS[k].article}
-                </span>
+                {country.articles && (
+                  <span className="mt-1 font-mono text-xs uppercase tracking-wider text-[var(--text-muted)]">
+                    {country.articles[RIGHT_OF[k]]}
+                  </span>
+                )}
               </button>
             );
           })}
@@ -134,7 +143,7 @@ export const LetterGenerator: React.FC<{ lang: Lang }> = ({ lang }) => {
           <Field id="fullName" label={s.fullName} value={fields.fullName} onChange={update} autoComplete="name" />
           <Field id="address" label={s.address} value={fields.address} onChange={update} autoComplete="street-address" />
           <Field id="contact" label={s.contact} value={fields.contact} onChange={update} />
-          <Field id="city" label={s.city} value={fields.city} onChange={update} placeholder="Dakar" autoComplete="address-level2" />
+          <Field id="city" label={s.city} value={fields.city} onChange={update} placeholder={s.cityPlaceholder} autoComplete="address-level2" />
           <p className="border-t border-[var(--border)] pt-5 font-mono text-xs uppercase tracking-[0.14em] text-[var(--text-muted)]">
             {s.org}
           </p>
@@ -179,8 +188,8 @@ export const LetterGenerator: React.FC<{ lang: Lang }> = ({ lang }) => {
           >
             {letter}
           </pre>
-          <p className="mt-3 text-sm leading-relaxed text-[var(--text-muted)]">{s.lawNote}</p>
-          {s.langNote && <p className="mt-2 text-xs text-[var(--text-muted)]">{s.langNote}</p>}
+          <p className="mt-3 text-sm leading-relaxed text-[var(--text-muted)]">{lawNote}</p>
+          {langNote && <p className="mt-2 text-xs text-[var(--text-muted)]">{langNote}</p>}
         </div>
       </div>
     </section>

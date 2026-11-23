@@ -1,7 +1,8 @@
-import React, { Suspense, lazy, useCallback, useEffect, useState } from 'react';
+import React, { Suspense, lazy, useCallback, useEffect, useMemo, useState } from 'react';
 import { STR, type Lang } from './i18n';
 import { parseHash, scrollToId, type Route } from './lib/router';
 import { track } from './lib/stats';
+import { CountryContext, countryProfile, initialCountry, saveCountry, type CountryCode } from './lib/country';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { Home } from './components/Home';
@@ -48,6 +49,17 @@ const App: React.FC = () => {
   const [lang, setLang] = useState<Lang>(initialLang);
   const [theme, setTheme] = useState<'dark' | 'light'>('light');
   const [route, setRoute] = useState<Route>(parseHash());
+  const [countryCode, setCountryCode] = useState<CountryCode>(initialCountry);
+  const countryValue = useMemo(
+    () => ({
+      country: countryProfile(countryCode),
+      setCountry: (code: CountryCode) => {
+        setCountryCode(code);
+        saveCountry(code);
+      },
+    }),
+    [countryCode],
+  );
 
   useEffect(() => {
     // Light "paper" theme is the primary design; a saved choice still wins.
@@ -138,6 +150,7 @@ const App: React.FC = () => {
   }
 
   return (
+    <CountryContext.Provider value={countryValue}>
     <div className="flex min-h-dvh flex-col bg-[var(--bg)] text-[var(--text-muted)]">
       <a
         href="#main"
@@ -161,6 +174,7 @@ const App: React.FC = () => {
       </main>
       <Footer lang={lang} />
     </div>
+    </CountryContext.Provider>
   );
 };
 

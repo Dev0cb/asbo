@@ -1,14 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { STR, QUIZ, CHECKLIST, quizResult, type Lang } from '../i18n';
 import { LAB_STR, QUIZ_WHY } from '../data/labs';
-import { analyzeMessage, type Analysis } from '../lib/scamCheck';
 import { track } from '../lib/stats';
 import { IconCheck, IconAlert, IconArrow } from './icons';
 import { PhishingTrainer } from './tools/PhishingTrainer';
 import { PasswordTester } from './tools/PasswordTester';
 import { FootprintLab } from './tools/FootprintLab';
 import { AssistantLab } from './tools/AssistantLab';
-import { CheckerAI } from './tools/CheckerAI';
+import { ScamChecker } from './tools/ScamChecker';
+import { CountryPicker } from './CountryPicker';
 import { aiPreviewEnabled } from '../lib/llm/protocol';
 
 const AI_PREVIEW = aiPreviewEnabled();
@@ -69,6 +69,7 @@ export const ToolsPage: React.FC<Props> = ({ lang, slug }) => {
         {t.tools.title}
       </h1>
       <p className="mt-3 max-w-2xl text-[var(--text-muted)]">{t.tools.intro}</p>
+      <CountryPicker lang={lang} withHint className="mt-5" />
 
       <div className={`mt-6 grid grid-cols-3 gap-2 sm:grid-cols-4 ${AI_PREVIEW ? 'lg:grid-cols-7' : 'lg:grid-cols-6'}`} role="tablist">
         {tabs.map((tb) => (
@@ -91,7 +92,7 @@ export const ToolsPage: React.FC<Props> = ({ lang, slug }) => {
       <div className="mt-6">
         {tab === 'quiz' && <Quiz lang={lang} />}
         {tab === 'phishing' && <PhishingTrainer lang={lang} />}
-        {tab === 'checker' && <Checker lang={lang} />}
+        {tab === 'checker' && <ScamChecker lang={lang} aiPreview={AI_PREVIEW} />}
         {tab === 'assistant' && AI_PREVIEW && <AssistantLab lang={lang} />}
         {tab === 'password' && <PasswordTester lang={lang} />}
         {tab === 'footprint' && <FootprintLab lang={lang} />}
@@ -240,103 +241,6 @@ const QuizFeedback: React.FC<{
         {last ? s.quizSeeResult : s.quizNext}
         <IconArrow className="h-4 w-4" />
       </button>
-    </div>
-  );
-};
-
-/* ---------------- Scam Checker ---------------- */
-
-const verdictConfig: Record<Analysis['verdict'], { color: string; labelKey: string }> = {
-  danger: { color: 'var(--bad)', labelKey: 'checkerVerdictDanger' },
-  suspect: { color: 'var(--warn)', labelKey: 'checkerVerdictSuspect' },
-  unclear: { color: 'var(--text-muted)', labelKey: 'checkerVerdictUnclear' },
-  'probably-ok': { color: 'var(--good)', labelKey: 'checkerVerdictOk' },
-};
-
-const Checker: React.FC<{ lang: Lang }> = ({ lang }) => {
-  const t = STR[lang];
-  const [text, setText] = useState('');
-  const [result, setResult] = useState<Analysis | null>(null);
-
-  const run = () => {
-    const r = analyzeMessage(text);
-    setResult(r);
-    track('checker_use', { score: r.score, verdict: r.verdict });
-  };
-
-  const vc = result ? verdictConfig[result.verdict] : null;
-
-  return (
-    <div className="space-y-4">
-      <div className="card p-5 sm:p-6">
-        <label htmlFor="msg" className="text-sm font-semibold text-[var(--text-heading)]">
-          {t.tools.checkerTitle}
-        </label>
-        <textarea
-          id="msg"
-          rows={5}
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder={t.tools.checkerPlaceholder}
-          className="input mt-3 resize-y font-mono text-sm"
-        />
-        <div className="mt-4 flex flex-wrap items-center gap-3">
-          <button onClick={run} className="btn-primary" disabled={!text.trim()}>
-            {t.tools.checkerBtn}
-          </button>
-          <span className="text-xs text-[var(--text-muted)]">{t.tools.checkerLocal}</span>
-        </div>
-      </div>
-
-      {result && vc && (
-        <div className="card p-5 sm:p-6">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <p className="text-lg font-bold" style={{ color: vc.color }}>
-              {t.tools[vc.labelKey as keyof typeof t.tools] as string}
-            </p>
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-[var(--text-muted)]">{t.tools.checkerScore}</span>
-              <span className="text-2xl font-extrabold" style={{ color: vc.color }}>
-                {result.score}
-              </span>
-            </div>
-          </div>
-          <div className="mt-2 h-2 overflow-hidden rounded-full bg-[var(--bg)]">
-            <div
-              className="h-full transition-all"
-              style={{ width: `${result.score}%`, background: vc.color }}
-            />
-          </div>
-          {result.findings.length > 0 && (
-            <ul className="mt-5 space-y-3">
-              {result.findings.map((f, i) => (
-                <li key={i} className="flex gap-3 rounded-xl border border-[var(--border)] bg-[var(--bg)] p-3">
-                  <IconAlert
-                    className="mt-0.5 h-5 w-5 shrink-0"
-                    style={{ color: f.severity === 'high' ? 'var(--bad)' : f.severity === 'medium' ? 'var(--warn)' : 'var(--text-muted)' } as React.CSSProperties}
-                  />
-                  <div>
-                    <p className="text-sm font-semibold text-[var(--text-heading)]">{f.label}</p>
-                    <p className="mt-0.5 text-sm text-[var(--text-muted)]">{f.detail}</p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-          <div className="mt-5 rounded-xl border border-[var(--color-accent)]/40 bg-[var(--color-accent)]/5 p-4">
-            <p className="text-sm font-semibold text-[var(--text-heading)]">{t.tools.checkerTip}</p>
-            <ul className="mt-2 space-y-1.5">
-              {result.tips.map((tip, i) => (
-                <li key={i} className="flex gap-2 text-sm text-[var(--text-muted)]">
-                  <IconCheck className="mt-0.5 h-4 w-4 shrink-0 text-[var(--good)]" />
-                  {tip}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      )}
-      {result && AI_PREVIEW && <CheckerAI key={`${result.score}-${text.length}`} lang={lang} text={text} analysis={result} />}
     </div>
   );
 };

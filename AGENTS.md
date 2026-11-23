@@ -81,8 +81,10 @@ platform/
 │   │   ├── router.ts       # parseHash/navigate helpers
 │   │   ├── session.ts      # anonymous session UUID (localStorage)
 │   │   ├── stats.ts        # track() → Supabase + localStorage mirror
-│   │   ├── scamCheck.ts    # heuristic scam-message analyser (client-side)
-│   │   └── password.ts     # password crack-time estimator + CSPRNG passphrase
+│   │   ├── scam/           # deterministic scam engine: normalize → rules + url → score/combos/verdict
+│   │   ├── exposure/       # self-OSINT: model.ts (index, correlations, what-if), textScan.ts
+│   │   ├── passphrase.ts   # BIP39-FR + local word list, unbiased CSPRNG generator
+│   │   └── password.ts     # password crack-time estimator (word-by-word attack model)
 │   └── components/
 │       ├── Header/Footer   # nav, lang/theme toggles, PWA install btn
 │       ├── Home.tsx        # hero (aurora bg), scam ticker, sections
@@ -158,6 +160,28 @@ platform/
 - Audit method: headless Chrome via CDP, every route × dark/light at 390px,
   checking target size, font size, input font size and WCAG contrast.
 
+## Audience and countries (owner, 2026-11-23)
+
+- **Primary audience: Senegalese users; institutional targets: the CDP and
+  the ministry.** Other nationalities may use the tools and learn, but the
+  content stays Senegal-first.
+- **Only verifiable content.** Never add a foreign law, authority, article,
+  official domain, ID-number format or menu path we cannot verify. When in
+  doubt, use general wording ("la législation applicable", "l'autorité
+  compétente") or leave it out.
+- `src/lib/country.ts`: two profiles only — `SN` (loi n° 2008-12, articles
+  62/68/69, CDP, Wave / Orange Money / Free Money, CNI) and `OTHER`
+  (generic wording, letter in the UI language, no law named). Default:
+  saved choice (`asbo-country`), otherwise SN — never guessed from the
+  browser locale (many Senegalese phones use `fr-FR`). `CountryPicker` on Tools, Rights and footer.
+- Copy placeholders `{money}`, `{money1}`, `{id}` are filled by
+  `fillCountry()`.
+- Scam engine `BRANDS`: list only official domains we are sure of; a brand
+  without a verified domain has `tokens: []` (its links are never called
+  "fake" or "official").
+- The "Une autorité par pays" table (`AUTHORITIES` in `data/letters.ts`) is
+  the owner's original indicative list — do not extend it without a source.
+
 ## Content conventions
 
 - **All user-facing text lives in `src/i18n.ts`** (`STR.fr` / `STR.en`) —
@@ -216,7 +240,12 @@ platform/
 - HTTPS cert: if `gh api repos/Dev0cb/asbo/pages` has no
   `https_certificate` field, GitHub never requested one — remove and re-add
   the custom domain to trigger it (see Deployment).
-- No tests yet — verification is `tsc --noEmit` + `vite build` + visual
+- Unit tests: `npm test` (vitest) — `src/lib/**/*.test.ts` cover the
+  password estimator, the scam engine (anonymised corpus incl. legitimate
+  messages) and the exposure model. Add a corpus case for every new rule.
+  Install with `npm install --ignore-scripts` (onnxruntime-node's postinstall
+  downloads ~1 GB of CUDA libs and filled the disk once).
+- Verification is also `tsc --noEmit` + `vite build` + visual
   check with headless Chrome screenshots, e.g.
   `google-chrome --headless=new --hide-scrollbars --virtual-time-budget=5000
   --window-size=390,2400 --screenshot=out.png "http://localhost:4173/#/guides"`
@@ -233,12 +262,25 @@ for Senegal and the Sécurité design system:
 - **Vrai ou arnaque ?** (`PhishingTrainer`) ← its "Détecteur de phishing":
   8 SMS/WhatsApp/e-mail scenarios, clues + explanation after each answer.
 - **Mot de passe** (`PasswordTester` + `lib/password.ts`) ← "Craquage de mots
-  de passe", but with a real guesses-based estimate (common/Senegalese words,
-  word+digits, compound words, sequences) at 1e10 guesses/s. The typed value
-  is NEVER tracked/stored/sent. Passphrases use `crypto.getRandomValues`.
-- **Vos données parlent** (`FootprintLab`) ← "Vos données parlent" (OSINT):
-  4 "Facebook quiz" answers → guessable passwords, secret-question answers,
-  tailored scam message.
+  de passe", with a guesses-based estimate at 1e10 guesses/s = the cheapest of
+  brute force, common words/word+digits, sequences AND a word-by-word attack
+  (each word = one pick from a dictionary; the ASBO list is public, so a
+  passphrase is only as strong as its number of random words). Generator
+  (`lib/passphrase.ts`): 6 words from ~2,200 (BIP39 French + local words),
+  rejection sampling, number at a random position. Typed value NEVER tracked.
+- **Détecteur d'arnaque** (`tools/ScamChecker.tsx` + `lib/scam/`): no AI.
+  Six rule families (urgency, sensitive data, financial promise, links,
+  impersonation, payment) with per-family caps, offline URL analysis (brand
+  look-alikes, typosquatting, shorteners, IP, punycode, TLD, .apk), combination
+  floors (code + fake site → critical…), verdicts low/moderate/high/critical
+  at 20/40/70. Copy in `data/scamText.ts`. Never say "message sûr".
+- **Vos données parlent** (`FootprintLab`) — 3 modes: a real free-text form
+  (city, year, close relative, passion; validated in `validateFootprint`) that
+  builds guessable passwords + a trap message using the user's country; a self-audit (`tools/ExposureAudit.tsx`, 17 declared items, index =
+  Σ weight × accessibility + scenario bonus, 11 correlation scenarios,
+  "what if" quick wins); a local scan of the user's own text
+  (`tools/ExposureScan.tsx`, secrets masked). Copy in `data/exposure.ts`.
+  Answers are kept in memory only.
 - **Quiz explanations** (`QUIZ_WHY`) ← "Sécurité des comptes": feedback +
   "why" after each answer. Keep `QUIZ_WHY` in the same order as `QUIZ`.
 - Event `lab_complete` `{lab, score?, max?, lang}` (no DB constraint on type).

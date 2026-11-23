@@ -1,4 +1,5 @@
 import React from 'react';
+import { CountryPicker } from './CountryPicker';
 import { STR, type Lang } from '../i18n';
 import { AUTHOR } from '../config';
 import { navigate } from '../lib/router';
@@ -68,7 +69,8 @@ export const Footer: React.FC<{ lang: Lang }> = ({ lang }) => {
             </ul>
           </div>
         </div>
-        <div className="mt-10 flex flex-col gap-2 border-t border-[var(--border)] pt-6 text-xs text-[var(--text-muted)] sm:flex-row sm:items-center sm:justify-between">
+        <CountryPicker lang={lang} className="mt-10" />
+        <div className="mt-6 flex flex-col gap-2 border-t border-[var(--border)] pt-6 text-xs text-[var(--text-muted)] sm:flex-row sm:items-center sm:justify-between">
           <span>© {new Date().getFullYear()} ASBO Platform</span>
           <span>
             {lang === 'fr' ? 'Conçu et développé par ' : 'Designed and built by '}

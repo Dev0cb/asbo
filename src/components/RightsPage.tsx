@@ -4,27 +4,35 @@ import { IconAlert, IconArrow } from './icons';
 import { scrollToId } from '../lib/router';
 import { LetterGenerator } from './LetterGenerator';
 import { AUTHORITIES, AUTHORITY_STR } from '../data/letters';
+import { useCountry, type RightsArticles } from '../lib/country';
+import { CountryPicker } from './CountryPicker';
 
 interface Props {
   lang: Lang;
 }
 
-const RIGHTS = [
+const RIGHTS: { t: 'r1t' | 'r2t' | 'r3t' | 'r4t'; d: 'r1d' | 'r2d' | 'r3d' | 'r4d'; a: keyof RightsArticles | null }[] = [
   { t: 'r1t', d: 'r1d', a: null },
-  { t: 'r2t', d: 'r2d', a: 'r2a' },
-  { t: 'r3t', d: 'r3d', a: 'r3a' },
-  { t: 'r4t', d: 'r4d', a: 'r4a' },
-] as const;
+  { t: 'r2t', d: 'r2d', a: 'access' },
+  { t: 'r3t', d: 'r3d', a: 'rectification' },
+  { t: 'r4t', d: 'r4d', a: 'objection' },
+];
 
 export const RightsPage: React.FC<Props> = ({ lang }) => {
   const r = STR[lang].rights;
   const au = AUTHORITY_STR[lang];
   const letterCta = lang === 'fr' ? 'Générer ma lettre' : 'Generate my letter';
+  const { country } = useCountry();
+  const steps = r.howSteps.map((step, i) =>
+    i === r.howSteps.length - 1
+      ? `${step} ${country.authority ? r.authorityFor(country.name[lang], country.authority.name) : r.authorityUnknown}`
+      : step,
+  );
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
       <header className="max-w-3xl">
-        <p className="eyebrow">{r.eyebrow}</p>
+        <p className="eyebrow">{country.authority ? country.authority.lawShort : r.eyebrow}</p>
         <h1 className="mt-4 text-4xl font-semibold leading-[1.08] text-[var(--text-heading)] sm:text-5xl">{r.title}</h1>
         <p className="mt-5 text-lg leading-relaxed text-[var(--text-muted)]">{r.intro}</p>
         <a
@@ -37,6 +45,7 @@ export const RightsPage: React.FC<Props> = ({ lang }) => {
         >
           {letterCta} <IconArrow className="h-4 w-4" />
         </a>
+        <CountryPicker lang={lang} withHint className="mt-8" />
       </header>
 
       <section className="rule-top mt-14 pt-8">
@@ -46,8 +55,10 @@ export const RightsPage: React.FC<Props> = ({ lang }) => {
             <li key={item.t} className="bg-[var(--bg-card)] p-6">
               <div className="flex items-baseline justify-between gap-3">
                 <span className="font-mono text-sm text-[var(--text-muted)]">{String(i + 1).padStart(2, '0')}</span>
-                {item.a && (
-                  <span className="font-mono text-xs uppercase tracking-wider text-[var(--accent-text)]">{r[item.a]}</span>
+                {item.a && country.articles && (
+                  <span className="font-mono text-xs uppercase tracking-wider text-[var(--accent-text)]">
+                    {r.articleLabel(country.articles[item.a])}
+                  </span>
                 )}
               </div>
               <h3 className="mt-3 text-lg font-semibold text-[var(--text-heading)]">{r[item.t]}</h3>
@@ -61,7 +72,7 @@ export const RightsPage: React.FC<Props> = ({ lang }) => {
         <div>
           <h2 className="text-2xl font-semibold text-[var(--text-heading)]">{r.howTitle}</h2>
           <ol className="mt-5 space-y-4">
-            {r.howSteps.map((step, i) => (
+            {steps.map((step, i) => (
               <li key={step} className="flex gap-4">
                 <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[var(--rule)] font-mono text-sm font-medium text-[var(--text-heading)]">
                   {i + 1}

@@ -3,6 +3,8 @@ export type Lang = 'fr' | 'en';
 export const STR = {
   fr: {
     ui: {
+      countryLabel: 'Votre pays',
+      countryHint: 'Hors du Sénégal, les outils restent utilisables : seules les références à la loi sénégalaise et à la CDP sont remplacées par des formulations générales.',
       menu: 'Menu',
       skip: 'Aller au contenu',
       theme: 'Thème',
@@ -140,7 +142,7 @@ export const STR = {
       checkNone: 'Tout décocher',
     },
     rights: {
-      eyebrow: 'Loi n° 2008-12 du 25 janvier 2008',
+      eyebrow: 'Protection des données personnelles',
       title: 'Vos droits sur vos données personnelles',
       intro: 'Opérateur, banque, employeur, application : toute organisation qui collecte vos données doit respecter vos droits. Vous pouvez les exercer directement auprès d\'elle, par écrit et gratuitement.',
       rightsTitle: 'Ce que la loi vous permet d\'exiger',
@@ -148,19 +150,19 @@ export const STR = {
       r1d: 'Savoir qui collecte vos données, dans quel but, pour combien de temps et à qui elles sont transmises.',
       r2t: 'Accéder à vos données',
       r2d: 'Demander si vos données sont traitées et en obtenir une copie compréhensible.',
-      r2a: 'Article 62',
       r3t: 'Les faire corriger ou supprimer',
       r3d: 'Exiger la correction de données inexactes, ou la suppression de données qui n\'ont pas lieu d\'être conservées.',
-      r3a: 'Article 69',
       r4t: 'Vous opposer',
       r4d: 'Refuser, pour un motif légitime, l\'utilisation de vos données, et sans motif à des fins de prospection commerciale.',
-      r4a: 'Article 68',
       howTitle: 'En pratique, en 3 étapes',
       howSteps: [
         'Générez votre lettre ci-dessous et envoyez-la à l\'organisation concernée (courrier avec accusé de réception ou e-mail).',
         'Conservez une copie de votre demande et la preuve de son envoi.',
-        'Sans réponse satisfaisante, adressez une réclamation à l\'autorité de protection des données compétente, en joignant ces preuves. Au Sénégal, c\'est la Commission de Protection des Données Personnelles (CDP).',
+        'Sans réponse satisfaisante, adressez une réclamation à l\'autorité de protection des données compétente, en joignant ces preuves.',
       ],
+      authorityFor: (country: string, name: string) => `${country} : ${name}.`,
+      authorityUnknown: 'Hors du Sénégal, cherchez l\'autorité de votre pays (le tableau « Une autorité par pays » ci-dessous est indicatif).',
+      articleLabel: (a: string) => a.charAt(0).toUpperCase() + a.slice(1),
       warnTitle: 'Exercer vos droits est toujours gratuit',
       warnText: 'Aucune organisation, aucun intermédiaire ne peut vous demander d\'argent ou vos codes pour traiter votre demande. Méfiez-vous de quiconque le prétend.',
     },
@@ -204,6 +206,8 @@ export const STR = {
 
   en: {
     ui: {
+      countryLabel: 'Your country',
+      countryHint: 'Outside Senegal, the tools still work: only the references to Senegalese law and the CDP are replaced by general wording.',
       menu: 'Menu',
       skip: 'Skip to content',
       theme: 'Theme',
@@ -341,7 +345,7 @@ export const STR = {
       checkNone: 'Uncheck all',
     },
     rights: {
-      eyebrow: 'Act No. 2008-12 of 25 January 2008',
+      eyebrow: 'Personal data protection',
       title: 'Your rights over your personal data',
       intro: 'Operator, bank, employer, app: any organisation that collects your data must respect your rights. You can exercise them directly with it, in writing and free of charge.',
       rightsTitle: 'What the law lets you demand',
@@ -349,19 +353,19 @@ export const STR = {
       r1d: 'Know who collects your data, for what purpose, for how long and who it is shared with.',
       r2t: 'Access your data',
       r2d: 'Ask whether your data is processed and get an understandable copy.',
-      r2a: 'Article 62',
       r3t: 'Have it corrected or deleted',
       r3d: 'Demand correction of inaccurate data, or deletion of data that should not be kept.',
-      r3a: 'Article 69',
       r4t: 'Object',
       r4d: 'Refuse the use of your data on legitimate grounds, and without any reason for direct marketing.',
-      r4a: 'Article 68',
       howTitle: 'In practice, in 3 steps',
       howSteps: [
         'Generate your letter below and send it to the organisation (registered mail or email).',
         'Keep a copy of your request and proof that you sent it.',
-        'Without a satisfactory answer, file a complaint with the competent data protection authority, attaching that proof. In Senegal, this is the Commission de Protection des Données Personnelles (CDP).',
+        'Without a satisfactory answer, file a complaint with the competent data protection authority, attaching that proof.',
       ],
+      authorityFor: (country: string, name: string) => `${country}: ${name}.`,
+      authorityUnknown: 'Outside Senegal, look up your country\'s authority (the "One authority per country" table below is indicative).',
+      articleLabel: (a: string) => a.charAt(0).toUpperCase() + a.slice(1),
       warnTitle: 'Exercising your rights is always free',
       warnText: 'No organisation or middleman can ask you for money or your codes to handle your request. Be wary of anyone who claims otherwise.',
     },
