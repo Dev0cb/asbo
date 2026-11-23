@@ -3,8 +3,6 @@ export type Lang = 'fr' | 'en';
 export const STR = {
   fr: {
     ui: {
-      countryLabel: 'Votre pays',
-      countryHint: 'Hors du Sénégal, les outils restent utilisables : seules les références à la loi sénégalaise et à la CDP sont remplacées par des formulations générales.',
       menu: 'Menu',
       skip: 'Aller au contenu',
       theme: 'Thème',
@@ -39,7 +37,7 @@ export const STR = {
       stats3: 'gratuit, même hors ligne',
       madeIn: 'Conçu au Sénégal',
       readGuide: 'Lire le guide',
-      specimenLabel: 'Messages reçus cette semaine',
+      specimenLabel: 'Exemples de messages : deux arnaques et un message légitime',
       specimenScam: 'Arnaque',
       specimenSafe: 'Vérifié',
       specimens: [
@@ -206,8 +204,6 @@ export const STR = {
 
   en: {
     ui: {
-      countryLabel: 'Your country',
-      countryHint: 'Outside Senegal, the tools still work: only the references to Senegalese law and the CDP are replaced by general wording.',
       menu: 'Menu',
       skip: 'Skip to content',
       theme: 'Theme',
@@ -242,7 +238,7 @@ export const STR = {
       stats3: 'free, even offline',
       madeIn: 'Designed in Senegal',
       readGuide: 'Read guide',
-      specimenLabel: 'Messages received this week',
+      specimenLabel: 'Example messages: two scams and one genuine message',
       specimenScam: 'Scam',
       specimenSafe: 'Verified',
       specimens: [

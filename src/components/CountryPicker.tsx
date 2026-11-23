@@ -1,28 +1,29 @@
 import React from 'react';
-import { STR, type Lang } from '../i18n';
+import type { Lang } from '../i18n';
 import { COUNTRIES, useCountry, type CountryCode } from '../lib/country';
 
 interface Props {
   lang: Lang;
-  /** Shows the one-line explanation under the select. */
-  withHint?: boolean;
+  /** Contextual label, e.g. "Pays de l'organisation" in the letter generator. */
+  label: string;
+  hint?: string;
   className?: string;
 }
 
-/** Global country setting (remembered on this device only). */
-export const CountryPicker: React.FC<Props> = ({ lang, withHint = false, className = '' }) => {
-  const t = STR[lang].ui;
+/** Senegal / other-country setting (remembered on this device only). */
+export const CountryPicker: React.FC<Props> = ({ lang, label, hint, className = '' }) => {
   const { country, setCountry } = useCountry();
   const id = React.useId();
   return (
     <div className={className}>
       <label htmlFor={id} className="block text-sm font-medium text-[var(--text-heading)]">
-        {t.countryLabel}
+        {label}
       </label>
       <select
         id={id}
         value={country.code}
         onChange={(e) => setCountry(e.target.value as CountryCode)}
+        aria-describedby={hint ? `${id}-hint` : undefined}
         className="input mt-1.5 max-w-xs"
       >
         {COUNTRIES.map((c) => (
@@ -31,7 +32,11 @@ export const CountryPicker: React.FC<Props> = ({ lang, withHint = false, classNa
           </option>
         ))}
       </select>
-      {withHint && <p className="mt-1.5 text-xs text-[var(--text-muted)]">{t.countryHint}</p>}
+      {hint && (
+        <p id={`${id}-hint`} className="mt-1.5 text-xs text-[var(--text-muted)]">
+          {hint}
+        </p>
+      )}
     </div>
   );
 };

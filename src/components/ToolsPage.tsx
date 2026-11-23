@@ -8,7 +8,6 @@ import { PasswordTester } from './tools/PasswordTester';
 import { FootprintLab } from './tools/FootprintLab';
 import { AssistantLab } from './tools/AssistantLab';
 import { ScamChecker } from './tools/ScamChecker';
-import { CountryPicker } from './CountryPicker';
 import { aiPreviewEnabled } from '../lib/llm/protocol';
 
 const AI_PREVIEW = aiPreviewEnabled();
@@ -71,7 +70,6 @@ export const ToolsPage: React.FC<Props> = ({ lang, slug, sub }) => {
         {t.tools.title}
       </h1>
       <p className="mt-3 max-w-2xl text-[var(--text-muted)]">{t.tools.intro}</p>
-      <CountryPicker lang={lang} withHint className="mt-5" />
 
       <div className={`mt-6 grid grid-cols-3 gap-2 sm:grid-cols-4 ${AI_PREVIEW ? 'lg:grid-cols-7' : 'lg:grid-cols-6'}`} role="tablist">
         {tabs.map((tb) => (

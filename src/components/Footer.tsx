@@ -1,9 +1,8 @@
 import React from 'react';
-import { CountryPicker } from './CountryPicker';
 import { STR, type Lang } from '../i18n';
 import { AUTHOR } from '../config';
 import { navigate } from '../lib/router';
-import { AsboMark, IconExternal } from './icons';
+import { AsboMark, IconGitHub, IconGlobe, IconLinkedIn } from './icons';
 
 const linkClass = 'inline-flex min-h-11 items-center gap-1 text-[var(--text-muted)] transition-colors hover:text-[var(--text-heading)]';
 
@@ -16,9 +15,9 @@ export const Footer: React.FC<{ lang: Lang }> = ({ lang }) => {
     { to: '/auteur', label: t.nav.about },
   ];
   const external = [
-    { href: AUTHOR.portfolio, label: 'malickba.me' },
-    { href: AUTHOR.linkedin, label: 'LinkedIn' },
-    { href: AUTHOR.github, label: 'GitHub' },
+    { href: AUTHOR.portfolio, label: 'malickba.me', Icon: IconGlobe },
+    { href: AUTHOR.linkedin, label: 'LinkedIn', Icon: IconLinkedIn },
+    { href: AUTHOR.github, label: 'GitHub', Icon: IconGitHub },
   ];
 
   return (
@@ -61,16 +60,16 @@ export const Footer: React.FC<{ lang: Lang }> = ({ lang }) => {
             <ul className="mt-2 text-sm">
               {external.map((l) => (
                 <li key={l.href}>
-                  <a href={l.href} target="_blank" rel="noopener noreferrer" className={linkClass}>
-                    {l.label} <IconExternal className="h-3 w-3" />
+                  <a href={l.href} target="_blank" rel="noopener noreferrer" className={`${linkClass} gap-2.5`}>
+                    <l.Icon className="h-4 w-4 shrink-0" />
+                    {l.label}
                   </a>
                 </li>
               ))}
             </ul>
           </div>
         </div>
-        <CountryPicker lang={lang} className="mt-10" />
-        <div className="mt-6 flex flex-col gap-2 border-t border-[var(--border)] pt-6 text-xs text-[var(--text-muted)] sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-10 flex flex-col gap-2 border-t border-[var(--border)] pt-6 text-xs text-[var(--text-muted)] sm:flex-row sm:items-center sm:justify-between">
           <span>© {new Date().getFullYear()} ASBO Platform</span>
           <span>
             {lang === 'fr' ? 'Conçu et développé par ' : 'Designed and built by '}

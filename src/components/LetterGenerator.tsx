@@ -12,6 +12,7 @@ import {
 } from '../data/letters';
 import { track } from '../lib/stats';
 import { useCountry } from '../lib/country';
+import { CountryPicker } from './CountryPicker';
 import { IconCheck } from './icons';
 
 const KINDS = Object.keys(LETTER_KINDS) as LetterKind[];
@@ -103,6 +104,8 @@ export const LetterGenerator: React.FC<{ lang: Lang }> = ({ lang }) => {
       <p className="eyebrow">{s.eyebrow}</p>
       <h2 className="mt-3 text-3xl font-semibold text-[var(--text-heading)] sm:text-4xl">{s.title}</h2>
       <p className="mt-3 max-w-2xl text-[var(--text-muted)]">{s.intro}</p>
+
+      <CountryPicker lang={lang} label={s.orgCountry} hint={s.orgCountryHint} className="mt-8" />
 
       <fieldset className="mt-8">
         <legend className="text-sm font-semibold uppercase tracking-wider text-[var(--text-muted)]">{s.kind}</legend>

@@ -33,9 +33,6 @@ const Specimens: React.FC<{ lang: Lang }> = ({ lang }) => {
   const h = STR[lang].home;
   return (
     <figure className="relative mx-auto w-full max-w-md lg:mx-0" aria-label={h.specimenLabel}>
-      <figcaption className="mb-4 font-mono text-xs uppercase tracking-[0.14em] text-[var(--text-muted)]">
-        {h.specimenLabel}
-      </figcaption>
       <ul className="space-y-3">
         {h.specimens.map((m, i) => (
           <li

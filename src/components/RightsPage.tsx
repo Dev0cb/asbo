@@ -5,7 +5,6 @@ import { scrollToId } from '../lib/router';
 import { LetterGenerator } from './LetterGenerator';
 import { AUTHORITIES, AUTHORITY_STR } from '../data/letters';
 import { useCountry, type RightsArticles } from '../lib/country';
-import { CountryPicker } from './CountryPicker';
 
 interface Props {
   lang: Lang;
@@ -45,7 +44,6 @@ export const RightsPage: React.FC<Props> = ({ lang }) => {
         >
           {letterCta} <IconArrow className="h-4 w-4" />
         </a>
-        <CountryPicker lang={lang} withHint className="mt-8" />
       </header>
 
       <section className="rule-top mt-14 pt-8">

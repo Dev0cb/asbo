@@ -185,7 +185,9 @@ platform/
   62/68/69, CDP, Wave / Orange Money / Free Money, CNI) and `OTHER`
   (generic wording, letter in the UI language, no law named). Default:
   saved choice (`asbo-country`), otherwise SN — never guessed from the
-  browser locale (many Senegalese phones use `fr-FR`). `CountryPicker` on Tools, Rights and footer.
+  browser locale (many Senegalese phones use `fr-FR`). The only control is "Pays de l'organisation" inside the letter generator
+  (`CountryPicker` with a contextual label) — no generic "Votre pays" picker
+  elsewhere (owner, 2026-11-23: redundant).
 - Copy placeholders `{money}`, `{money1}`, `{id}` are filled by
   `fillCountry()`.
 - Scam engine `BRANDS`: list only official domains we are sure of; a brand
