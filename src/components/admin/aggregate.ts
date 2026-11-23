@@ -66,9 +66,12 @@ export interface Kpis {
   exercises: number;
 }
 
+/** The three modes of "Vos données parlent" (quiz form, self-audit, text scan). */
+const FOOTPRINT_LABS = ['footprint', 'exposure', 'exposure_scan'];
+
 function isExercise(r: EventRow) {
   if (r.type === 'quiz_complete' || r.type === 'checker_use') return true;
-  return r.type === 'lab_complete' && ['phishing', 'footprint'].includes(str(r.data?.lab));
+  return r.type === 'lab_complete' && ['phishing', ...FOOTPRINT_LABS].includes(str(r.data?.lab));
 }
 
 export function kpis(rows: EventRow[]): Kpis {
@@ -134,7 +137,7 @@ export function toolUsage(rows: EventRow[], s: DashStrings): Ranked[] {
     { key: 'quiz', label: s.tools.quiz, value: rows.filter((r) => r.type === 'quiz_complete').length },
     { key: 'phishing', label: s.tools.phishing, value: lab('phishing').length },
     { key: 'checker', label: s.tools.checker, value: rows.filter((r) => r.type === 'checker_use').length },
-    { key: 'footprint', label: s.tools.footprint, value: lab('footprint').length },
+    { key: 'footprint', label: s.tools.footprint, value: FOOTPRINT_LABS.reduce((n, name) => n + lab(name).length, 0) },
     { key: 'letter', label: s.tools.letter, value: lab('letter').length },
     { key: 'checklist', label: s.tools.checklist, value: checklistPeople },
   ].sort((a, b) => b.value - a.value);

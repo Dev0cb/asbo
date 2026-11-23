@@ -8,86 +8,91 @@ import { SCENARIO_COUNT, type Channel } from './phishing';
 
 /* ============================ Footprint ("Vos données parlent") ============================ */
 
-export interface FootprintQuestion {
-  id: 'city' | 'year' | 'name' | 'passion';
-  q: string;
+export type FootprintFieldId = 'city' | 'year' | 'name' | 'passion';
+
+export interface FootprintField {
+  id: FootprintFieldId;
+  label: string;
   hint: string;
-  options: string[];
+  placeholder: string;
+  /** Numeric year field, validated between MIN_YEAR and the current year. */
+  isYear?: boolean;
 }
 
-export const FOOTPRINT_QUESTIONS: Record<Lang, FootprintQuestion[]> = {
+export const FOOTPRINT_MIN_YEAR = 1930;
+export const FOOTPRINT_MAX_LENGTH = 40;
+
+/** Free-text fields: anyone, from any country, types their own answers. */
+export const FOOTPRINT_FIELDS: Record<Lang, FootprintField[]> = {
   fr: [
-    { id: 'city', q: 'Dans quelle ville avez-vous grandi ?', hint: 'Visible dans la section « À propos » de Facebook ou sur LinkedIn.', options: ['Dakar', 'Thiès', 'Saint-Louis', 'Ziguinchor', 'Touba', 'Kaolack'] },
-    { id: 'year', q: 'Une année importante pour vous (naissance, bac, mariage) ?', hint: 'Les posts « joyeux anniversaire » la révèlent chaque année.', options: ['1990', '1995', '1998', '2002', '2005', '2010'] },
-    { id: 'name', q: 'Le prénom de votre aîné(e) ou d\'un proche très cher ?', hint: 'Photos de baptême, tags, commentaires de la famille…', options: ['Awa', 'Moussa', 'Fatou', 'Cheikh', 'Aminata', 'Ibrahima'] },
-    { id: 'passion', q: 'Votre passion ou votre équipe favorite ?', hint: 'Photos de profil, groupes, pages suivies.', options: ['Lions', 'Lutte', 'Musique', 'Football', 'Cuisine', 'Voyages'] },
+    { id: 'city', label: 'La ville où vous avez grandi', hint: 'Souvent visible dans la section « À propos » de Facebook ou sur LinkedIn.', placeholder: 'Ex : Dakar, Abidjan, Lyon…' },
+    { id: 'year', label: 'Une année importante pour vous (naissance, bac, mariage)', hint: 'Les messages « joyeux anniversaire » la révèlent chaque année.', placeholder: 'Ex : 1998', isYear: true },
+    { id: 'name', label: 'Le prénom d\'un proche très cher (enfant, parent, conjoint)', hint: 'Photos de famille, identifications, commentaires…', placeholder: 'Ex : Awa, Kofi, Marie…' },
+    { id: 'passion', label: 'Votre passion ou votre équipe favorite', hint: 'Photo de profil, groupes, pages suivies.', placeholder: 'Ex : football, musique, cuisine…' },
   ],
   en: [
-    { id: 'city', q: 'Which city did you grow up in?', hint: 'Visible in the Facebook "About" section or on LinkedIn.', options: ['Dakar', 'Thiès', 'Saint-Louis', 'Ziguinchor', 'Touba', 'Kaolack'] },
-    { id: 'year', q: 'A year that matters to you (birth, graduation, wedding)?', hint: '"Happy birthday" posts reveal it every year.', options: ['1990', '1995', '1998', '2002', '2005', '2010'] },
-    { id: 'name', q: 'The first name of your eldest child or someone very dear?', hint: 'Naming-ceremony photos, tags, family comments…', options: ['Awa', 'Moussa', 'Fatou', 'Cheikh', 'Aminata', 'Ibrahima'] },
-    { id: 'passion', q: 'Your passion or favourite team?', hint: 'Profile pictures, groups, pages you follow.', options: ['Lions', 'Wrestling', 'Music', 'Football', 'Cooking', 'Travel'] },
+    { id: 'city', label: 'The city where you grew up', hint: 'Often visible in the Facebook "About" section or on LinkedIn.', placeholder: 'E.g. Dakar, Accra, London…' },
+    { id: 'year', label: 'A year that matters to you (birth, graduation, wedding)', hint: '"Happy birthday" posts reveal it every year.', placeholder: 'E.g. 1998', isYear: true },
+    { id: 'name', label: 'The first name of someone very dear (child, parent, partner)', hint: 'Family photos, tags, comments…', placeholder: 'E.g. Awa, Kofi, Mary…' },
+    { id: 'passion', label: 'Your passion or favourite team', hint: 'Profile picture, groups, pages you follow.', placeholder: 'E.g. football, music, cooking…' },
   ],
 };
 
-export type FootprintAnswers = Record<FootprintQuestion['id'], string>;
+export type FootprintAnswers = Record<FootprintFieldId, string>;
+export type FootprintErrors = Partial<Record<FootprintFieldId, 'required' | 'year' | 'tooLong'>>;
 
-const ascii = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^A-Za-z0-9]/g, '');
+/** Checks the form; returns an empty object when everything is valid. */
+export function validateFootprint(a: Partial<FootprintAnswers>, now = new Date()): FootprintErrors {
+  const errors: FootprintErrors = {};
+  for (const id of ['city', 'year', 'name', 'passion'] as FootprintFieldId[]) {
+    const v = (a[id] ?? '').trim();
+    if (!v) errors[id] = 'required';
+    else if (v.length > FOOTPRINT_MAX_LENGTH) errors[id] = 'tooLong';
+  }
+  const year = (a.year ?? '').trim();
+  if (year && !errors.year) {
+    const n = Number(year);
+    if (!/^\d{4}$/.test(year) || n < FOOTPRINT_MIN_YEAR || n > now.getFullYear()) errors.year = 'year';
+  }
+  return errors;
+}
+
+/** Latin letters/digits only ("Thiès" → "Thies"); keeps the raw word for other scripts. */
+const ascii = (s: string) => {
+  const latin = s.trim().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^A-Za-z0-9]/g, '');
+  return latin || s.trim().replace(/\s+/g, '');
+};
+const capitalise = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 /** Passwords an attacker would try first, built only from the answers. */
 export function guessablePasswords(a: FootprintAnswers): string[] {
-  const city = ascii(a.city);
-  const name = ascii(a.name);
-  const passion = ascii(a.passion);
-  const year = a.year;
-  return [
-    `${name}${year}`,
-    `${city}${year}!`,
-    `${passion}221`,
-    `${name}_${city}`,
-    `${passion}${year.slice(2)}`,
-    `${name.toLowerCase()}${year}@`,
-  ];
+  const city = capitalise(ascii(a.city));
+  const name = capitalise(ascii(a.name));
+  const passion = capitalise(ascii(a.passion));
+  const year = a.year.trim();
+  return Array.from(
+    new Set([
+      `${name}${year}`,
+      `${city}${year}!`,
+      `${passion}${year.slice(2)}`,
+      `${name}_${city}`,
+      `${passion}123`,
+      `${name.toLowerCase()}${year}@`,
+    ]),
+  );
 }
 
-export function footprintScam(a: FootprintAnswers, lang: Lang): string {
-  const slug = ascii(a.city).toLowerCase();
+/** A tailor-made trap message built from the answers and the user's country. */
+export function footprintScam(a: FootprintAnswers, lang: Lang, money: string): string {
+  const slug = ascii(a.city).toLowerCase().slice(0, 12) || 'promo';
+  const city = a.city.trim();
+  const name = a.name.trim();
+  const passion = a.passion.trim();
+  const year = a.year.trim();
   return lang === 'fr'
-    ? `Salam ! Les supporters « ${a.passion} » de ${a.city} organisent un grand tirage pour les membres nés en ${a.year} 🎁. ${a.name} t'a inscrit(e) ! Confirme ta place ici : bit.ly/tirage-${slug}`
-    : `Salam! The "${a.passion}" fans of ${a.city} are holding a big draw for members born in ${a.year} 🎁. ${a.name} signed you up! Confirm your spot here: bit.ly/draw-${slug}`;
+    ? `Salut ! Les fans de « ${passion} » de ${city} organisent un grand tirage pour les membres nés en ${year}. ${name} t'a inscrit(e) ! Pour recevoir ton gain par ${money}, confirme ta place ici : bit.ly/tirage-${slug}`
+    : `Hi! The "${passion}" fans of ${city} are holding a big draw for members born in ${year}. ${name} signed you up! To receive your prize by ${money}, confirm your spot here: bit.ly/draw-${slug}`;
 }
-
-/* ============================== Passphrase words ============================== */
-
-// 250 simple, easy-to-type words (FR + Wolof). Five random words from this
-// list plus a number ≈ 46 bits even if the attacker knows the list.
-export const PASSPHRASE_WORDS = [
-  'baobab', 'teranga', 'thieb', 'yassa', 'mafe', 'bissap', 'attaya', 'pirogue', 'lutte', 'sabar',
-  'djembe', 'kora', 'goree', 'lac-rose', 'niokolo', 'casamance', 'sine', 'saloum', 'fleuve', 'dune',
-  'mangue', 'arachide', 'mil', 'riz', 'poisson', 'lion', 'gazelle', 'pelican', 'tortue', 'dauphin',
-  'soleil', 'lune', 'etoile', 'nuage', 'pluie', 'vent', 'orage', 'sable', 'ocean', 'vague',
-  'montagne', 'riviere', 'foret', 'jardin', 'marche', 'village', 'quartier', 'maison', 'fenetre', 'porte',
-  'cahier', 'crayon', 'livre', 'tableau', 'ecole', 'velo', 'moto', 'taxi', 'car-rapide', 'train',
-  'avion', 'bateau', 'chemin', 'pont', 'route', 'place', 'stade', 'musique', 'guitare', 'tambour',
-  'danse', 'chanson', 'poeme', 'conte', 'griot', 'sagesse', 'courage', 'patience', 'respect', 'jom',
-  'ndank', 'jamm', 'xarit', 'ndaw', 'mag', 'suba', 'guddi', 'tey', 'ganaw', 'kanam',
-  'orange', 'citron', 'banane', 'papaye', 'coco', 'goyave', 'tamarin', 'gingembre', 'menthe', 'cafe',
-  'the', 'lait', 'pain', 'beignet', 'fataya', 'thiakry', 'lakh', 'ngalakh', 'couscous', 'mbaxal',
-  'rouge', 'vert', 'jaune', 'bleu', 'violet', 'blanc', 'noir', 'gris', 'dore', 'argent',
-  'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche', 'matin', 'midi', 'soir',
-  'chat', 'chien', 'cheval', 'chevre', 'mouton', 'poule', 'coq', 'ane', 'chameau', 'hibou',
-  'lampe', 'bougie', 'miroir', 'tapis', 'natte', 'calebasse', 'panier', 'bol', 'cuillere', 'marmite',
-  'nord', 'sud', 'est', 'ouest', 'colline', 'plaine', 'savane', 'desert', 'oasis', 'ile',
-  'ami', 'voisin', 'cousin', 'frere', 'soeur', 'oncle', 'tante', 'grand', 'petit', 'sage',
-  'rapide', 'calme', 'joyeux', 'brave', 'fier', 'doux', 'fort', 'leger', 'clair', 'vif',
-  'parapluie', 'chapeau', 'boubou', 'sandale', 'ceinture', 'bracelet', 'collier', 'perle', 'tissu', 'wax',
-  'telephone', 'radio', 'journal', 'lettre', 'timbre', 'carte', 'boussole', 'horloge', 'cle', 'cadenas',
-  'football', 'basket', 'course', 'nage', 'saut', 'balle', 'filet', 'but', 'arbitre', 'coupe',
-  'piment', 'oignon', 'tomate', 'carotte', 'manioc', 'igname', 'gombo', 'aubergine', 'chou', 'haricot',
-  'aigle', 'corbeau', 'moineau', 'perroquet', 'flamant', 'heron', 'crabe', 'crevette', 'thiof', 'yaboy',
-  'lumiere', 'ombre', 'feu', 'glace', 'brume', 'aube', 'crepuscule', 'eclair', 'arc-en-ciel', 'tonnerre',
-  'zebre', 'girafe', 'elephant', 'hyene', 'singe', 'phacochere', 'antilope', 'buffle', 'crocodile', 'hippo',
-];
 
 /* ================================ UI strings ================================ */
 
@@ -103,7 +108,11 @@ const PW_FINDINGS: Record<Lang, Record<FindingKey, string>> = {
     noUpper: 'Aucune majuscule.',
     noDigit: 'Aucun chiffre.',
     noSymbol: 'Aucun symbole (! ? # @ …).',
-    passphrase: 'Phrase de passe de plusieurs mots : longue ET facile à retenir. Excellent.',
+    passphrase: 'Phrase de passe : facile à retenir. Sa force vient du nombre de mots tirés au hasard, pas du nombre de lettres.',
+    dictionaryWords: 'Un pirate attaque une phrase de passe mot par mot, avec des dictionnaires (y compris la liste publique d\'ASBO). Le calcul ci-dessus en tient compte.',
+    fewWords: 'Moins de 6 mots : ajoutez-en un ou deux, tirés au hasard. Avec la liste d\'ASBO, chaque mot de plus multiplie le travail du pirate par environ 2 000.',
+    digitsAtEnd: 'Chiffres collés à la fin : c\'est le premier endroit où les pirates en ajoutent. Placez-les entre deux mots.',
+    personalWords: 'Contient des mots très courants (villes, prénoms, Wave…) : ce sont les premiers testés.',
   },
   en: {
     common: 'One of the most used passwords (or words): attackers try it first.',
@@ -116,7 +125,11 @@ const PW_FINDINGS: Record<Lang, Record<FindingKey, string>> = {
     noUpper: 'No uppercase letter.',
     noDigit: 'No digit.',
     noSymbol: 'No symbol (! ? # @ …).',
-    passphrase: 'Multi-word passphrase: long AND easy to remember. Excellent.',
+    passphrase: 'Passphrase: easy to remember. Its strength comes from how many words were drawn at random, not from the number of letters.',
+    dictionaryWords: 'Attackers crack passphrases word by word, with dictionaries (including ASBO\'s public list). The estimate above accounts for this.',
+    fewWords: 'Fewer than 6 words: add one or two, picked at random. With ASBO\'s list, each extra word multiplies the attacker\'s work by about 2,000.',
+    digitsAtEnd: 'Digits stuck at the end: the first place attackers add them. Put them between two words.',
+    personalWords: 'Contains very common words (cities, first names, Wave…): attackers try these first.',
   },
 };
 
@@ -164,19 +177,29 @@ export const LAB_STR = {
       advice: 'Conseil : n\'y tapez pas votre vrai mot de passe. Testez plutôt un mot de passe qui lui ressemble.',
       findings: 'Analyse',
       genTitle: 'Besoin d\'idée ? Une phrase de passe',
-      genText: 'Plusieurs mots au hasard reliés par des tirets : long, solide, et facile à retenir. Générée sur votre appareil.',
+      genText: '6 mots tirés au hasard dans une liste de plus de 2 000 mots, et un nombre placé au hasard. Générée sur votre appareil, avec le générateur aléatoire sécurisé du navigateur.',
+      bits: (bits: number, words: number) => `≈ ${bits} bits d'imprévisibilité${words ? ` · ${words} mot${words > 1 ? 's' : ''} reconnu${words > 1 ? 's' : ''}` : ''}`,
       genBtn: 'Générer une phrase de passe',
       genTry: 'Tester celle-ci',
       tips: [
         'Un mot de passe différent pour chaque compte important (e-mail, Wave, banque, Facebook).',
         'Activez la double vérification : même volé, le mot de passe ne suffit plus.',
         'Un gestionnaire de mots de passe (Bitwarden, Google, Apple) retient tout pour vous.',
+        'Laissez le hasard choisir les mots : des mots choisis « de tête » sont bien plus faciles à deviner.',
+        'Un mot de passe déjà écrit dans une conversation, une IA ou une capture d\'écran doit être considéré comme compromis : changez-le.',
       ],
       findingText: PW_FINDINGS.fr,
       units: TIME_UNITS.fr,
     },
     fp: {
-      intro: 'Ces questions ressemblent aux « quiz amusants » qui circulent sur Facebook (« Ton nom de star = ta ville + ton année de naissance »). Répondez, et voyez ce qu\'un pirate en ferait.',
+      intro: 'Ces questions ressemblent aux « quiz amusants » qui circulent sur les réseaux (« Ton nom de star = ta ville + ton année de naissance »). Remplissez le formulaire avec vos vraies réponses ou des réponses proches, et voyez ce qu\'un pirate en ferait.',
+      privacy: 'Vos réponses restent sur votre appareil : rien n\'est envoyé ni enregistré.',
+      submit: 'Voir ce qu\'un pirate en ferait',
+      errors: {
+        required: 'Ce champ est requis.',
+        year: 'Indiquez une année à 4 chiffres, entre 1930 et aujourd\'hui.',
+        tooLong: 'Réponse trop longue (40 caractères maximum).',
+      },
       step: 'Indice',
       analysing: 'Un pirate assemble vos réponses…',
       log: [
@@ -248,19 +271,29 @@ export const LAB_STR = {
       advice: 'Tip: don\'t type your real password here. Test a similar one instead.',
       findings: 'Analysis',
       genTitle: 'Need an idea? A passphrase',
-      genText: 'Several random words joined by dashes: long, strong, and easy to remember. Generated on your device.',
+      genText: '6 words drawn at random from a list of over 2,000, plus a number at a random spot. Generated on your device with the browser\'s secure random generator.',
+      bits: (bits: number, words: number) => `≈ ${bits} bits of unpredictability${words ? ` · ${words} word${words > 1 ? 's' : ''} recognised` : ''}`,
       genBtn: 'Generate a passphrase',
       genTry: 'Test this one',
       tips: [
         'A different password for every important account (email, Wave, bank, Facebook).',
         'Turn on two-step verification: even if stolen, the password is no longer enough.',
         'A password manager (Bitwarden, Google, Apple) remembers everything for you.',
+        'Let chance pick the words: words you choose "off the top of your head" are much easier to guess.',
+        'A password already typed into a chat, an AI or a screenshot should be treated as compromised: change it.',
       ],
       findingText: PW_FINDINGS.en,
       units: TIME_UNITS.en,
     },
     fp: {
-      intro: 'These questions look like the "fun quizzes" going around on Facebook ("Your star name = your city + birth year"). Answer, and see what an attacker would do with it.',
+      intro: 'These questions look like the "fun quizzes" going around on social media ("Your star name = your city + birth year"). Fill in the form with your real answers or similar ones, and see what an attacker would do with them.',
+      privacy: 'Your answers stay on your device: nothing is sent or saved.',
+      submit: 'See what an attacker would do',
+      errors: {
+        required: 'This field is required.',
+        year: 'Enter a 4-digit year, between 1930 and today.',
+        tooLong: 'Answer too long (40 characters maximum).',
+      },
       step: 'Clue',
       analysing: 'An attacker is piecing your answers together…',
       log: [

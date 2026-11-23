@@ -1,28 +1,35 @@
 import React, { useEffect, useState } from 'react';
 import type { Lang } from '../../i18n';
 import {
-  FOOTPRINT_QUESTIONS,
+  FOOTPRINT_FIELDS,
+  FOOTPRINT_MAX_LENGTH,
   LAB_STR,
   footprintScam,
   guessablePasswords,
+  validateFootprint,
   type FootprintAnswers,
-  type FootprintQuestion,
+  type FootprintErrors,
 } from '../../data/labs';
+import { fillCountry, useCountry } from '../../lib/country';
 import { track } from '../../lib/stats';
 import { IconAlert, IconCheck, IconEye } from '../icons';
+import { EXPOSURE_UI } from '../../data/exposure';
+import { ExposureAudit } from './ExposureAudit';
+import { ExposureScan } from './ExposureScan';
 
-type Phase = 'questions' | 'analysing' | 'result';
+type Phase = 'form' | 'analysing' | 'result';
 type ResultTab = 'pw' | 'q' | 'scam';
 
 const STEP_MS = 450;
 
-/** "Vos données parlent" — 4 innocent answers become an attack plan. */
-export const FootprintLab: React.FC<{ lang: Lang }> = ({ lang }) => {
+/** The original game: 4 innocent answers become an attack plan. */
+const FootprintGame: React.FC<{ lang: Lang }> = ({ lang }) => {
   const s = LAB_STR[lang].fp;
-  const questions = FOOTPRINT_QUESTIONS[lang];
-  const [step, setStep] = useState(0);
+  const fields = FOOTPRINT_FIELDS[lang];
+  const { country } = useCountry();
   const [answers, setAnswers] = useState<Partial<FootprintAnswers>>({});
-  const [phase, setPhase] = useState<Phase>('questions');
+  const [errors, setErrors] = useState<FootprintErrors>({});
+  const [phase, setPhase] = useState<Phase>('form');
   const [logLines, setLogLines] = useState(0);
   const [tab, setTab] = useState<ResultTab>('pw');
 
@@ -38,62 +45,67 @@ export const FootprintLab: React.FC<{ lang: Lang }> = ({ lang }) => {
     return () => window.clearTimeout(id);
   }, [phase, logLines, s.log.length]);
 
-  const answer = (q: FootprintQuestion, value: string) => {
-    const next = { ...answers, [q.id]: value };
-    setAnswers(next);
-    if (step + 1 < questions.length) {
-      setStep(step + 1);
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const found = validateFootprint(answers);
+    setErrors(found);
+    if (Object.keys(found).length > 0) {
+      document.getElementById(`fp-${Object.keys(found)[0]}`)?.focus();
       return;
     }
     setPhase('analysing');
+    // Only the fact that the lab was completed is counted — never the answers.
     track('lab_complete', { lab: 'footprint', lang });
   };
 
   const restart = () => {
-    setStep(0);
     setAnswers({});
-    setPhase('questions');
+    setErrors({});
+    setPhase('form');
     setLogLines(0);
     setTab('pw');
   };
 
-  if (phase === 'questions') {
-    const q = questions[step];
+  if (phase === 'form') {
     return (
       <div className="space-y-4">
         <p className="text-sm text-[var(--text-muted)]">{s.intro}</p>
-        <div className="card p-6 sm:p-8">
-          <div className="flex items-center justify-between text-sm text-[var(--text-muted)]">
-            <span>
-              {s.step} {step + 1}/{questions.length}
-            </span>
-            <div className="flex gap-1.5" aria-hidden="true">
-              {questions.map((_, i) => (
-                <span
-                  key={i}
-                  className="h-1.5 w-8 rounded-full"
-                  style={{ background: i <= step ? 'var(--color-accent)' : 'var(--bg-elevated)' }}
+        <form className="card space-y-5 p-6 sm:p-8" onSubmit={submit} noValidate>
+          {fields.map((f) => {
+            const error = errors[f.id];
+            return (
+              <div key={f.id}>
+                <label htmlFor={`fp-${f.id}`} className="block text-sm font-semibold text-[var(--text-heading)]">
+                  {f.label}
+                </label>
+                <p id={`fp-${f.id}-hint`} className="mt-1 flex items-start gap-2 text-xs text-[var(--text-muted)]">
+                  <IconEye className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                  {f.hint}
+                </p>
+                <input
+                  id={`fp-${f.id}`}
+                  value={answers[f.id] ?? ''}
+                  onChange={(e) => setAnswers((prev) => ({ ...prev, [f.id]: e.target.value }))}
+                  placeholder={f.placeholder}
+                  inputMode={f.isYear ? 'numeric' : 'text'}
+                  maxLength={f.isYear ? 4 : FOOTPRINT_MAX_LENGTH + 1}
+                  autoComplete="off"
+                  aria-invalid={!!error}
+                  aria-describedby={`fp-${f.id}-hint${error ? ` fp-${f.id}-error` : ''}`}
+                  className="input mt-2"
+                  style={error ? { borderColor: 'var(--bad)' } : undefined}
                 />
-              ))}
-            </div>
-          </div>
-          <h2 className="mt-6 text-xl font-bold leading-snug text-[var(--text-heading)] sm:text-2xl">{q.q}</h2>
-          <p className="mt-2 flex items-start gap-2 text-sm text-[var(--text-muted)]">
-            <IconEye className="mt-0.5 h-4 w-4 shrink-0" />
-            {q.hint}
-          </p>
-          <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
-            {q.options.map((opt) => (
-              <button
-                key={opt}
-                onClick={() => answer(q, opt)}
-                className="rounded-xl border border-[var(--border)] p-3.5 text-sm font-medium text-[var(--text)] transition-all hover:border-[var(--color-accent)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-heading)]"
-              >
-                {opt}
-              </button>
-            ))}
-          </div>
-        </div>
+                {error && (
+                  <p id={`fp-${f.id}-error`} className="mt-1 text-xs font-medium text-[var(--bad)]">
+                    {s.errors[error]}
+                  </p>
+                )}
+              </div>
+            );
+          })}
+          <button type="submit" className="btn-primary">{s.submit}</button>
+          <p className="text-xs text-[var(--text-muted)]">{s.privacy}</p>
+        </form>
       </div>
     );
   }
@@ -185,7 +197,7 @@ export const FootprintLab: React.FC<{ lang: Lang }> = ({ lang }) => {
             <>
               <p className="text-sm text-[var(--text-muted)]">{s.scamText}</p>
               <p className="mt-3 rounded-xl rounded-tl-sm border border-[#25d366]/40 bg-[#25d366]/10 p-4 text-sm leading-relaxed text-[var(--text-heading)]">
-                {footprintScam(full, lang)}
+                {footprintScam(full, lang, fillCountry('{money1}', country, lang))}
               </p>
             </>
           )}
@@ -203,6 +215,45 @@ export const FootprintLab: React.FC<{ lang: Lang }> = ({ lang }) => {
           ))}
         </ul>
         <button onClick={restart} className="btn-ghost mt-5">{s.restart}</button>
+      </div>
+    </div>
+  );
+};
+
+type Mode = 'game' | 'audit' | 'scan';
+const MODES: Mode[] = ['game', 'audit', 'scan'];
+
+/**
+ * "Vos données parlent": a self-OSINT lab in three modes — the attacker
+ * quiz, a declarative self-audit, and a local scan of a text the user wrote.
+ */
+export const FootprintLab: React.FC<{ lang: Lang }> = ({ lang }) => {
+  const ui = EXPOSURE_UI[lang];
+  const [mode, setMode] = useState<Mode>('game');
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-3 gap-2" role="tablist" aria-label={LAB_STR[lang].fp.title}>
+        {MODES.map((m) => (
+          <button
+            key={m}
+            type="button"
+            role="tab"
+            aria-selected={mode === m}
+            onClick={() => setMode(m)}
+            className={`min-h-11 rounded-lg px-2 py-2 text-center text-xs font-medium leading-tight transition-colors sm:text-sm ${
+              mode === m
+                ? 'bg-[var(--color-accent)]/15 text-[var(--text-heading)] ring-1 ring-[var(--color-accent)]'
+                : 'border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-heading)]'
+            }`}
+          >
+            {ui.modes[m]}
+          </button>
+        ))}
+      </div>
+      <div role="tabpanel">
+        {mode === 'game' && <FootprintGame lang={lang} />}
+        {mode === 'audit' && <ExposureAudit lang={lang} />}
+        {mode === 'scan' && <ExposureScan lang={lang} />}
       </div>
     </div>
   );
