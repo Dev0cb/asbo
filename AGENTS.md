@@ -190,10 +190,15 @@ platform/
   advisors: clean except "leaked password protection" (dashboard setting). Public sign-up is enabled in Auth but
   grants no read access. Add an admin: `insert into public.admins (user_id)
   values ('<auth uid>');` in the SQL editor.
-- Admin dashboard `/#/admin`: without env vars it shows **local demo stats**;
-  with Supabase it requires login, then aggregates up to 5000 recent events
-  client-side (visitors ≈ distinct session_id, pageviews, quizzes, top
-  guides, score buckets, 7-day chart, recent events table).
+- Admin dashboard `/#/admin` (`components/AdminPage.tsx` = auth + paged fetch;
+  `components/admin/` = `aggregate.ts` pure maths, `charts.tsx` SVG/HTML
+  charts, `Dashboard.tsx` layout, `strings.ts` plain-language FR/EN copy).
+  Real data only — no demo mode, no local mirror. Fetches every `events` row
+  in pages of 1,000 (PostgREST cap; the old `.limit(5000)` silently returned
+  1,000). Past ~200k rows, move aggregation to SQL views. Charts follow the
+  dataviz skill; chart colours are `--chart-*` tokens validated with its
+  palette validator in both themes. Audit test events are excluded in
+  `aggregate.ts` (`isAuditEvent`).
 
 ## Deployment
 

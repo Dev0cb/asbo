@@ -39,6 +39,17 @@
   --sn-green: #00853f;
   --sn-gold: #fdef42;
   --sn-red: #e31b23;
+  /* Charts — validated with the dataviz palette validator (light surface). */
+  --chart-series: #0b6b43;
+  --chart-wash: rgb(11 107 67 / 0.1);
+  --chart-track: #e3ecdf;
+  --chart-grid: #e7dfcf;
+  --chart-low: #b42318;
+  --chart-mid: #b07800;
+  --chart-high: #0b6b43;
+  --chart-on-low: #ffffff;
+  --chart-on-mid: #16150f;
+  --chart-on-high: #ffffff;
   color-scheme: light;
 }
 
@@ -60,6 +71,17 @@
   --good: #5fcb97;
   --warn: #e5b84b;
   --bad: #f08a7b;
+  /* Charts — dark steps validated separately against the dark surface. */
+  --chart-series: #5fcb97;
+  --chart-wash: rgb(95 203 151 / 0.1);
+  --chart-track: #24362c;
+  --chart-grid: #2b2c24;
+  --chart-low: #e4528a;
+  --chart-mid: #b5850c;
+  --chart-high: #2f9f6c;
+  --chart-on-low: #11120e;
+  --chart-on-mid: #11120e;
+  --chart-on-high: #11120e;
   color-scheme: dark;
 }
 

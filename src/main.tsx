@@ -12,6 +12,14 @@ ReactDOM.createRoot(rootElement).render(
   </React.StrictMode>,
 );
 
+// Older versions mirrored every analytics event into the visitor's own
+// localStorage (for a demo dashboard that no longer exists): clean it up.
+try {
+  localStorage.removeItem('securite-local-events');
+} catch {
+  /* storage unavailable */
+}
+
 // Register the service worker for offline support (production builds only).
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
   window.addEventListener('load', () => {

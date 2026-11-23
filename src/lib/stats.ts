@@ -52,21 +52,7 @@ export function track(type: EventType, data: Record<string, unknown> = {}) {
           .then(() => {});
       }
     });
-    // Local mirror so the admin demo still shows something without a backend.
-    const key = 'securite-local-events';
-    const list = JSON.parse(localStorage.getItem(key) || '[]');
-    list.push({ type, data, t: Date.now() });
-    if (list.length > 500) list.splice(0, list.length - 500);
-    localStorage.setItem(key, JSON.stringify(list));
   } catch {
     /* never throw */
-  }
-}
-
-export function getLocalEvents(): { type: string; data: any; t: number }[] {
-  try {
-    return JSON.parse(localStorage.getItem('securite-local-events') || '[]');
-  } catch {
-    return [];
   }
 }
