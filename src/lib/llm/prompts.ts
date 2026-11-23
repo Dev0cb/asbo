@@ -3,7 +3,8 @@
 // assistant passes the most relevant passages of ASBO's own guides.
 import type { Lang } from '../../i18n';
 import { GUIDES, type Guide } from '../../data/guides';
-import type { Analysis } from '../scamCheck';
+import type { Analysis } from '../scam/engine';
+import { describeSignals } from '../../data/scamText';
 import type { ChatMessage } from './protocol';
 
 const MAX_MESSAGE_CHARS = 1500;
@@ -14,12 +15,12 @@ const HISTORY_TURNS = 4;
 /* ------------------------------ Scam checker ------------------------------ */
 
 const VERDICT_LABEL: Record<Lang, Record<Analysis['verdict'], string>> = {
-  fr: { danger: 'arnaque probable', suspect: 'suspect', unclear: 'incertain', 'probably-ok': 'rien d\'alarmant' },
-  en: { danger: 'likely scam', suspect: 'suspicious', unclear: 'unclear', 'probably-ok': 'nothing alarming' },
+  fr: { critical: 'risque critique', high: 'risque élevé', moderate: 'risque modéré', low: 'aucun signal suspect' },
+  en: { critical: 'critical risk', high: 'high risk', moderate: 'moderate risk', low: 'no suspicious signal' },
 };
 
 export function checkerMessages(text: string, analysis: Analysis, lang: Lang): ChatMessage[] {
-  const signals = analysis.findings.map((f) => `- ${f.label} : ${f.detail}`).join('\n') || '-';
+  const signals = describeSignals(analysis.signals, lang) || '-';
   const system =
     lang === 'fr'
       ? `Tu es l'assistant de sécurité d'ASBO, une plateforme sénégalaise d'éducation à la cybersécurité. Tu aides des personnes non spécialistes à savoir si un message reçu (SMS, WhatsApp, e-mail, Facebook) est une arnaque.

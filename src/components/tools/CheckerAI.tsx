@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { Lang } from '../../i18n';
-import type { Analysis } from '../../lib/scamCheck';
+import type { Analysis } from '../../lib/scam/engine';
 import { generate, interrupt } from '../../lib/llm/engine';
 import { checkerMessages } from '../../lib/llm/prompts';
 import { track } from '../../lib/stats';
