@@ -59,7 +59,7 @@ export const ExposureScan: React.FC<{ lang: Lang }> = ({ lang }) => {
       {scan && report && (
         <>
           <div className="card p-5 sm:p-6" aria-live="polite">
-            <h3 className="font-semibold text-[var(--text-heading)]">{ui.scanFound}</h3>
+            <h2 className="font-sans text-base font-semibold text-[var(--text-heading)]">{ui.scanFound}</h2>
             {scan.findings.length === 0 ? (
               <p className="mt-2 text-sm text-[var(--text-muted)]">{ui.scanNone}</p>
             ) : (

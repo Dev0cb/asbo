@@ -54,7 +54,7 @@ export const ExposureAudit: React.FC<{ lang: Lang }> = ({ lang }) => {
   return (
     <div className="space-y-4">
       <p className="text-sm text-[var(--text-muted)]">{ui.auditIntro}</p>
-      <Dashboard lang={lang} report={report} actions={countActions(report, lang)} />
+      <Dashboard lang={lang} report={report} actions={countActions(report, lang)} pending={answered === 0} />
 
       <div className="card p-5 sm:p-6">
         <p className="text-xs uppercase tracking-wider text-[var(--text-muted)]">{ui.progress(answered, ITEMS.length)}</p>
@@ -68,11 +68,7 @@ export const ExposureAudit: React.FC<{ lang: Lang }> = ({ lang }) => {
             </div>
           </fieldset>
         ))}
-        {answered > 0 && (
-          <button type="button" onClick={() => setAnswers({})} className="btn-ghost mt-6 text-xs">
-            {ui.reset}
-          </button>
-        )}
+        {answered > 0 && <ResetAnswers lang={lang} count={answered} onConfirm={() => setAnswers({})} />}
       </div>
 
       <ScenarioList lang={lang} scenarios={report.scenarios} access={access} />
@@ -86,6 +82,40 @@ export const ExposureAudit: React.FC<{ lang: Lang }> = ({ lang }) => {
 export function countActions(report: ExposureReport, lang: Lang): number {
   return report.exposed.length + report.scenarios.reduce((n, s) => n + SCENARIO_TEXT[lang][s.id].actions.length, 0);
 }
+
+/** Two-step clear: a destructive action is never one tap away. */
+const ResetAnswers: React.FC<{ lang: Lang; count: number; onConfirm: () => void }> = ({ lang, count, onConfirm }) => {
+  const ui = EXPOSURE_UI[lang];
+  const [asking, setAsking] = useState(false);
+  if (!asking) {
+    return (
+      <button type="button" onClick={() => setAsking(true)} className="btn-ghost mt-6 text-xs">
+        {ui.reset}
+      </button>
+    );
+  }
+  return (
+    <div className="mt-6 rounded-lg border border-[var(--bad)]/50 bg-[var(--bad)]/5 p-4" role="group" aria-label={ui.reset}>
+      <p className="text-sm text-[var(--text-heading)]">{ui.resetQuestion(count)}</p>
+      <div className="mt-3 flex flex-wrap gap-2">
+        <button
+          type="button"
+          onClick={() => {
+            onConfirm();
+            setAsking(false);
+          }}
+          className="btn-ghost text-xs"
+          style={{ color: 'var(--bad)', borderColor: 'var(--bad)' }}
+        >
+          {ui.resetConfirm}
+        </button>
+        <button type="button" onClick={() => setAsking(false)} className="btn-ghost text-xs" autoFocus>
+          {ui.resetCancel}
+        </button>
+      </div>
+    </div>
+  );
+};
 
 const Question: React.FC<{ lang: Lang; meta: ItemMeta; value?: Answer; onChange: (v: Answer) => void }> = ({ lang, meta, value, onChange }) => {
   const { country } = useCountry();
@@ -128,9 +158,17 @@ const Question: React.FC<{ lang: Lang; meta: ItemMeta; value?: Answer; onChange:
   );
 };
 
-export const Dashboard: React.FC<{ lang: Lang; report: ExposureReport; actions: number }> = ({ lang, report, actions }) => {
+interface DashboardProps {
+  lang: Lang;
+  report: ExposureReport;
+  actions: number;
+  /** Nothing answered yet: show a neutral "—" instead of a reassuring "0 · Low". */
+  pending?: boolean;
+}
+
+export const Dashboard: React.FC<DashboardProps> = ({ lang, report, actions, pending = false }) => {
   const ui = EXPOSURE_UI[lang];
-  const color = LEVEL_COLOR[report.level];
+  const color = pending ? 'var(--text-muted)' : LEVEL_COLOR[report.level];
   const highRisk = report.scenarios.filter((s) => s.severity !== 'moderate').length;
   const stats: [number, string][] = [
     [report.exposed.length, ui.exposed],
@@ -139,17 +177,22 @@ export const Dashboard: React.FC<{ lang: Lang; report: ExposureReport; actions: 
     [actions, ui.actions],
   ];
   return (
-    <div className="card p-5 sm:p-6" aria-live="polite">
+    <div className="card p-5 sm:p-6">
+      {/* One short phrase for screen readers, instead of re-reading the whole card. */}
+      <p className="sr-only" aria-live="polite" aria-atomic="true">
+        {pending ? '' : ui.liveIndex(report.index, LEVEL_TEXT[lang][report.level])}
+      </p>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="text-xs uppercase tracking-wider text-[var(--text-muted)]">{ui.index}</p>
           <p className="text-4xl font-extrabold" style={{ color }}>
-            {report.index}
+            {pending ? '—' : report.index}
             <span className="text-base font-semibold text-[var(--text-muted)]">/100</span>
           </p>
         </div>
-        <span className="chip" style={{ color, borderColor: color }}>{LEVEL_TEXT[lang][report.level]}</span>
+        {!pending && <span className="chip" style={{ color, borderColor: color }}>{LEVEL_TEXT[lang][report.level]}</span>}
       </div>
+      {pending && <p className="mt-2 text-sm text-[var(--text-muted)]">{ui.pendingHint}</p>}
       <div className="mt-2 h-2 overflow-hidden rounded-full bg-[var(--bg)]" aria-hidden="true">
         <div className="h-full transition-all" style={{ width: `${report.index}%`, background: color }} />
       </div>
@@ -173,7 +216,7 @@ export const ScenarioList: React.FC<{ lang: Lang; scenarios: Scenario[]; access:
   const fill = (t: string) => fillCountry(t, country, lang);
   return (
     <div className="card p-5 sm:p-6">
-      <h3 className="font-semibold text-[var(--text-heading)]">{ui.scenariosTitle}</h3>
+      <h2 className="font-sans text-base font-semibold text-[var(--text-heading)]">{ui.scenariosTitle}</h2>
       {scenarios.length === 0 ? (
         <p className="mt-2 text-sm text-[var(--text-muted)]">{ui.scenariosNone}</p>
       ) : (
@@ -217,7 +260,7 @@ const QuickWins: React.FC<{ lang: Lang; report: ExposureReport }> = ({ lang, rep
   const ui = EXPOSURE_UI[lang];
   return (
     <div className="card p-5 sm:p-6">
-      <h3 className="font-semibold text-[var(--text-heading)]">{ui.quickWinsTitle}</h3>
+      <h2 className="font-sans text-base font-semibold text-[var(--text-heading)]">{ui.quickWinsTitle}</h2>
       <ul className="mt-3 space-y-2">
         {report.quickWins.map((w) => (
           <li key={w.id} className="flex items-start justify-between gap-3 text-sm">
@@ -235,7 +278,7 @@ const Fixes: React.FC<{ lang: Lang; report: ExposureReport }> = ({ lang, report 
   const { country } = useCountry();
   return (
     <div className="card p-5 sm:p-6">
-      <h3 className="font-semibold text-[var(--text-heading)]">{ui.fixTitle}</h3>
+      <h2 className="font-sans text-base font-semibold text-[var(--text-heading)]">{ui.fixTitle}</h2>
       <ul className="mt-3 space-y-3">
         {report.exposed.map((id) => (
           <li key={id} className="text-sm">
