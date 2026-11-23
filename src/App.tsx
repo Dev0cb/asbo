@@ -121,7 +121,7 @@ const App: React.FC = () => {
   if (seg === 'guides') {
     page = <GuidesPage lang={lang} slug={sub} />;
   } else if (seg === 'outils') {
-    page = <ToolsPage lang={lang} slug={sub} />;
+    page = <ToolsPage lang={lang} slug={sub} sub={route.path[2]} />;
   } else if (seg === 'droits') {
     page = <RightsPage lang={lang} />;
   } else if (seg === 'auteur') {

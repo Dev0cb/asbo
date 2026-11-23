@@ -35,6 +35,12 @@ export const ExposureScan: React.FC<{ lang: Lang }> = ({ lang }) => {
     <div className="space-y-4">
       <div className="card p-5 sm:p-6">
         <p className="text-sm text-[var(--text-muted)]">{ui.scanIntro}</p>
+        <p className="mt-1 text-sm text-[var(--text-muted)]">
+          {ui.crossText}{' '}
+          <a href="#/outils/detecteur" className="inline-flex min-h-11 items-center font-medium text-[var(--accent-text)] underline underline-offset-4">
+            {ui.crossCta}
+          </a>
+        </p>
         <textarea
           aria-label={ui.scanBtn}
           rows={6}

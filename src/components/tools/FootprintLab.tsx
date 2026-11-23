@@ -223,13 +223,28 @@ const FootprintGame: React.FC<{ lang: Lang }> = ({ lang }) => {
 type Mode = 'game' | 'audit' | 'scan';
 const MODES: Mode[] = ['game', 'audit', 'scan'];
 
+/** URL slug of each mode: #/outils/vos-donnees/quiz | audit | texte. */
+const MODE_SLUGS: Record<Mode, string> = { game: 'quiz', audit: 'audit', scan: 'texte' };
+const modeFromSlug = (slug?: string): Mode => MODES.find((m) => MODE_SLUGS[m] === slug) ?? 'game';
+
 /**
  * "Vos données parlent": a self-OSINT lab in three modes — the attacker
  * quiz, a declarative self-audit, and a local scan of a text the user wrote.
  */
-export const FootprintLab: React.FC<{ lang: Lang }> = ({ lang }) => {
+export const FootprintLab: React.FC<{ lang: Lang; modeSlug?: string }> = ({ lang, modeSlug }) => {
   const ui = EXPOSURE_UI[lang];
-  const [mode, setMode] = useState<Mode>('game');
+  const [mode, setMode] = useState<Mode>(() => modeFromSlug(modeSlug));
+
+  // Follow links such as #/outils/vos-donnees/texte from other tools.
+  useEffect(() => {
+    setMode(modeFromSlug(modeSlug));
+  }, [modeSlug]);
+
+  const selectMode = (m: Mode) => {
+    setMode(m);
+    // Shareable URL, without triggering a hashchange (no scroll jump).
+    history.replaceState(null, '', `#/outils/vos-donnees/${MODE_SLUGS[m]}`);
+  };
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-3 gap-2" role="tablist" aria-label={LAB_STR[lang].fp.title}>
@@ -239,7 +254,7 @@ export const FootprintLab: React.FC<{ lang: Lang }> = ({ lang }) => {
             type="button"
             role="tab"
             aria-selected={mode === m}
-            onClick={() => setMode(m)}
+            onClick={() => selectMode(m)}
             className={`min-h-11 rounded-lg px-2 py-2 text-center text-xs font-medium leading-tight transition-colors sm:text-sm ${
               mode === m
                 ? 'bg-[var(--color-accent)]/15 text-[var(--text-heading)] ring-1 ring-[var(--color-accent)]'

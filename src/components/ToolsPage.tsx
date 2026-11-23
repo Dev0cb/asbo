@@ -16,6 +16,8 @@ const AI_PREVIEW = aiPreviewEnabled();
 interface Props {
   lang: Lang;
   slug?: string;
+  /** Third URL segment, e.g. the mode in #/outils/vos-donnees/texte. */
+  sub?: string;
 }
 
 // URL slug for each tool, e.g. #/outils/mot-de-passe (shareable links).
@@ -38,7 +40,7 @@ function tabFromSlug(slug?: string): Tab {
   return found ?? 'quiz';
 }
 
-export const ToolsPage: React.FC<Props> = ({ lang, slug }) => {
+export const ToolsPage: React.FC<Props> = ({ lang, slug, sub }) => {
   const t = STR[lang];
   const [tab, setTab] = useState<Tab>(() => tabFromSlug(slug));
 
@@ -95,7 +97,7 @@ export const ToolsPage: React.FC<Props> = ({ lang, slug }) => {
         {tab === 'checker' && <ScamChecker lang={lang} aiPreview={AI_PREVIEW} />}
         {tab === 'assistant' && AI_PREVIEW && <AssistantLab lang={lang} />}
         {tab === 'password' && <PasswordTester lang={lang} />}
-        {tab === 'footprint' && <FootprintLab lang={lang} />}
+        {tab === 'footprint' && <FootprintLab lang={lang} modeSlug={sub} />}
         {tab === 'checklist' && <Checklist lang={lang} />}
       </div>
     </div>

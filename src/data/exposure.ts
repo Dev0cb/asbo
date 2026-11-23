@@ -155,7 +155,9 @@ export const LEVEL_TEXT: Record<Lang, Record<Level, string>> = {
 
 export const EXPOSURE_UI = {
   fr: {
-    modes: { game: 'Le quiz du pirate', audit: 'Mon auto-audit', scan: 'Analyser un texte' },
+    modes: { game: 'Le quiz du pirate', audit: 'Mon auto-audit', scan: 'Ce que mon texte révèle' },
+    crossText: 'Vous avez reçu un message suspect (SMS, WhatsApp, e-mail) ?',
+    crossCta: 'Utilisez plutôt le Détecteur d\'arnaque',
     auditIntro: 'Répondez honnêtement : vos réponses restent sur votre appareil. L\'indice se met à jour à chaque réponse, et vous pouvez changer une réponse pour voir l\'effet (« et si je la cachais ? »).',
     progress: (n: number, total: number) => `${n} / ${total} réponses`,
     index: 'Indice d\'exposition numérique',
@@ -182,7 +184,9 @@ export const EXPOSURE_UI = {
     counter: (n: number, max: number) => `${n.toLocaleString('fr')} / ${max.toLocaleString('fr')} caractères`,
   },
   en: {
-    modes: { game: 'The attacker quiz', audit: 'My self-audit', scan: 'Analyse a text' },
+    modes: { game: 'The attacker quiz', audit: 'My self-audit', scan: 'What my text reveals' },
+    crossText: 'Received a suspicious message (SMS, WhatsApp, email)?',
+    crossCta: 'Use the Scam detector instead',
     auditIntro: 'Answer honestly: your answers stay on your device. The index updates with each answer, and you can change an answer to see the effect ("what if I hid it?").',
     progress: (n: number, total: number) => `${n} / ${total} answers`,
     index: 'Digital exposure index',

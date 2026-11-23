@@ -104,7 +104,7 @@ platform/
 ## Routes (hash-based)
 
 `#/` home · `#/guides` index · `#/guides/<slug>` article · `#/outils`
-(tools; deep links `#/outils/quiz|vrai-ou-arnaque|detecteur|mot-de-passe|vos-donnees|checklist`) · `#/droits` (data rights/CDP) · `#/auteur` (author) · `#/admin`
+(tools; deep links `#/outils/quiz|vrai-ou-arnaque|detecteur|mot-de-passe|vos-donnees|checklist`; "Vos données parlent" modes `#/outils/vos-donnees/quiz|audit|texte`) · `#/droits` (data rights/CDP) · `#/auteur` (author) · `#/admin`
 (dashboard). Guide slugs (same in FR/EN): `hameconnage`, `mobile-money`,
 `mots-de-passe`, `reseaux-sociaux`, `telephone-appareil`, `wifi-public`,
 `enfants-en-ligne`, `infox-faux-profils`, `que-faire-urgence`.

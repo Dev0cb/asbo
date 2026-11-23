@@ -66,6 +66,12 @@ export const ScamChecker: React.FC<Props> = ({ lang, aiPreview }) => {
           </button>
           <span className="text-xs text-[var(--text-muted)]">{ui.privacy}</span>
         </div>
+        <p className="mt-3 text-sm text-[var(--text-muted)]">
+          {ui.crossText}{' '}
+          <a href="#/outils/vos-donnees/texte" className="inline-flex min-h-11 items-center font-medium text-[var(--accent-text)] underline underline-offset-4">
+            {ui.crossCta}
+          </a>
+        </p>
       </div>
 
       {result && <Result lang={lang} result={result} />}

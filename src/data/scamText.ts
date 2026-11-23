@@ -160,6 +160,8 @@ export const CHECKER_UI = {
     officialLink: 'domaine officiel',
     method: 'Analyse par règles, sans IA : chaque signal a un poids, certaines combinaisons déclenchent directement un risque critique. C\'est un indicateur, pas une preuve.',
     privacy: 'Analyse locale · Aucun compte requis · Aucun message conservé',
+    crossText: 'Vous voulez savoir ce que votre propre bio ou publication révèle sur vous ?',
+    crossCta: 'Essayez « Ce que mon texte révèle »',
   },
   en: {
     counter: (n: number, max: number) => `${n.toLocaleString('en')} / ${max.toLocaleString('en')} characters`,
@@ -172,6 +174,8 @@ export const CHECKER_UI = {
     officialLink: 'official domain',
     method: 'Rule-based analysis, no AI: each signal has a weight, and some combinations trigger a critical risk directly. It is an indicator, not proof.',
     privacy: 'Local analysis · No account needed · No message stored',
+    crossText: 'Want to know what your own bio or post reveals about you?',
+    crossCta: 'Try "What my text reveals"',
   },
 } as const;
 
