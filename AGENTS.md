@@ -240,7 +240,8 @@ platform/
 - HTTPS cert: if `gh api repos/Dev0cb/asbo/pages` has no
   `https_certificate` field, GitHub never requested one — remove and re-add
   the custom domain to trigger it (see Deployment).
-- Unit tests: `npm test` (vitest) — `src/lib/**/*.test.ts` cover the
+- Unit tests: `npm test` (vitest), run with `tsc --noEmit` in the deploy
+  workflow before the build — a failure blocks the deployment — `src/lib/**/*.test.ts` cover the
   password estimator, the scam engine (anonymised corpus incl. legitimate
   messages) and the exposure model. Add a corpus case for every new rule.
   Install with `npm install --ignore-scripts` (onnxruntime-node's postinstall
