@@ -157,6 +157,18 @@ platform/
   backgrounds/borders (e.g. `.btn-primary` gradient with dark text).
 - No emoji as UI icons (flag emoji shows "SN" on Windows) — use SVG (`FlagSN`).
 - Moving content must be pausable: the scam ticker pauses on hover, focus and tap.
+- Responsive (2026-11-23 audit, 21 routes × 320/360/768/1920 px, 0 overflow):
+  - Fractional grids use `minmax(0,…)` tracks (`grid-cols-[minmax(0,1fr)]`,
+    `lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]`). A plain `1fr` track grows
+    to its widest content (long URL, table) and, with `overflow-x: clip` on
+    body, the overflow is silently CUT OFF instead of scrolling.
+  - `.chip` wraps when too long (no `nowrap`); button rows use `flex-wrap`.
+  - Home hero: both CTAs must be fully visible above the fold from 320×568
+    to 1920×1080 (measure the CTA's bottom vs. the viewport height).
+  - `html { scroll-padding-top: 5rem }` keeps anchor jumps clear of the
+    sticky header.
+  - Test in a fresh Chrome profile or with `Network.setBypassServiceWorker`:
+    the service worker otherwise serves the previous build.
 - Audit method: headless Chrome via CDP, every route × dark/light at 390px,
   checking target size, font size, input font size and WCAG contrast.
 

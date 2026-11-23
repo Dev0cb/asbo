@@ -68,7 +68,7 @@ export const RightsPage: React.FC<Props> = ({ lang }) => {
         </ol>
       </section>
 
-      <section className="mt-12 grid gap-8 lg:grid-cols-[1fr_1fr]">
+      <section className="mt-12 grid grid-cols-[minmax(0,1fr)] gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
         <div>
           <h2 className="text-2xl font-semibold text-[var(--text-heading)]">{r.howTitle}</h2>
           <ol className="mt-5 space-y-4">
@@ -92,7 +92,7 @@ export const RightsPage: React.FC<Props> = ({ lang }) => {
       </section>
 
       <section className="rule-top mt-16 pt-8" aria-labelledby="authorities-title">
-        <div className="grid gap-8 lg:grid-cols-[1fr_1.4fr]">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
           <div>
             <p className="eyebrow">{au.eyebrow}</p>
             <h2 id="authorities-title" className="mt-3 text-3xl font-semibold text-[var(--text-heading)]">{au.title}</h2>

@@ -88,6 +88,8 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    /* Keep in-page jumps (scrollToId, focus) clear of the sticky header. */
+    scroll-padding-top: 5rem;
   }
 
   html,
@@ -210,7 +212,10 @@
   font-size: 0.75rem;
   font-weight: 500;
   color: var(--text-muted);
-  white-space: nowrap;
+  /* Short chips stay on one line; long ones wrap instead of being cut off
+     on narrow screens (body has overflow-x: clip). */
+  max-width: 100%;
+  overflow-wrap: anywhere;
   background: var(--bg-elevated);
 }
 

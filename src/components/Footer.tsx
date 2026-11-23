@@ -24,7 +24,7 @@ export const Footer: React.FC<{ lang: Lang }> = ({ lang }) => {
   return (
     <footer className="mt-24 border-t border-[var(--rule)]">
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
-        <div className="grid gap-10 md:grid-cols-[1.6fr_1fr_1fr]">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-10 md:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)_minmax(0,1fr)]">
           <div>
             <div className="flex items-center gap-2.5">
               <AsboMark className="h-9 w-9" />

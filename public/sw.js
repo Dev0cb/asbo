@@ -1,5 +1,5 @@
 // ASBO service worker — offline-first for the app shell, network-first for pages.
-const CACHE = 'asbo-v11';
+const CACHE = 'asbo-v12';
 const PRECACHE = ['./', './index.html', './manifest.webmanifest', './favicon.svg'];
 
 self.addEventListener('install', (event) => {

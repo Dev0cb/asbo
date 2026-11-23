@@ -14,7 +14,7 @@ export const AboutPage: React.FC<Props> = ({ lang }) => {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
-      <div className="grid gap-12 lg:grid-cols-[1.35fr_1fr]">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-12 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
         <section>
           <p className="eyebrow">{a.eyebrow}</p>
           <h1 className="mt-4 text-5xl font-semibold leading-none text-[var(--text-heading)] sm:text-6xl">{a.title}</h1>

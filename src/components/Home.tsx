@@ -48,7 +48,7 @@ const Specimens: React.FC<{ lang: Lang }> = ({ lang }) => {
               <span aria-hidden="true">·</span>
               <span className="truncate font-medium text-[var(--text-heading)]">{m.from}</span>
             </p>
-            <p className="mt-1.5 text-sm leading-snug text-[var(--text)]">{m.text}</p>
+            <p className="mt-1.5 break-words text-sm leading-snug text-[var(--text)]">{m.text}</p>
             <span
               className="stamp absolute right-3 top-1/2 -translate-y-1/2"
               style={{ color: m.scam ? 'var(--bad)' : 'var(--good)', transform: `translateY(-50%) rotate(${m.scam ? -8 : 6}deg)` }}
@@ -72,7 +72,7 @@ const Hero: React.FC<{ lang: Lang }> = ({ lang }) => {
   return (
     <section className="relative">
       <div className="dot-grid pointer-events-none absolute inset-0 -z-10" aria-hidden="true" />
-      <div className="grid items-center gap-14 pb-16 pt-14 sm:pt-20 lg:grid-cols-[1.25fr_1fr] lg:pb-24">
+      <div className="grid grid-cols-[minmax(0,1fr)] items-center gap-12 pb-14 pt-4 min-[360px]:pt-6 sm:pt-12 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:gap-14 lg:pb-20 lg:pt-10">
         <div>
           <div className="flex flex-wrap items-center gap-2">
             <span className="chip">{h.badge}</span>
@@ -81,12 +81,12 @@ const Hero: React.FC<{ lang: Lang }> = ({ lang }) => {
               {h.madeIn}
             </span>
           </div>
-          <h1 className="mt-7 text-[2.75rem] font-semibold leading-[1.02] text-[var(--text-heading)] sm:text-6xl lg:text-7xl">
+          <h1 className="mt-4 text-[2.1rem] font-semibold min-[360px]:mt-5 min-[360px]:text-[2.5rem] leading-[1.02] text-[var(--text-heading)] sm:mt-7 sm:text-6xl min-[1440px]:text-7xl">
             {h.titleA} <span className="mark italic">{h.titleB}</span>
           </h1>
-          <p className="mt-5 font-mono text-xs uppercase tracking-[0.14em] text-[var(--accent-text)]">{h.meaning}</p>
-          <p className="mt-6 max-w-xl text-lg leading-relaxed text-[var(--text)] sm:text-xl">{h.sub}</p>
-          <div className="mt-8 flex flex-wrap gap-3">
+          <p className="mt-3 font-mono text-xs uppercase tracking-[0.14em] text-[var(--accent-text)] sm:mt-5">{h.meaning}</p>
+          <p className="mt-4 max-w-xl text-base leading-relaxed text-[var(--text)] sm:mt-6 sm:text-lg lg:text-xl">{h.sub}</p>
+          <div className="mt-6 flex flex-wrap gap-3 sm:mt-8">
             <Go to="/outils/quiz" className="btn-primary px-6 text-base">
               {h.ctaQuiz} <IconArrow className="h-4 w-4" />
             </Go>
@@ -94,7 +94,7 @@ const Hero: React.FC<{ lang: Lang }> = ({ lang }) => {
               {h.ctaGuides}
             </Go>
           </div>
-          <dl className="mt-12 grid max-w-xl grid-cols-3 divide-x divide-[var(--border)] border-y border-[var(--border)]">
+          <dl className="mt-8 grid max-w-xl grid-cols-3 lg:mt-10 divide-x divide-[var(--border)] border-y border-[var(--border)]">
             {stats.map((s) => (
               <div key={s.label} className="px-3 py-4 first:pl-0">
                 <dt className="sr-only">{s.label}</dt>
@@ -159,7 +159,7 @@ const Why: React.FC<{ lang: Lang }> = ({ lang }) => {
   }));
   return (
     <section className="py-20 sm:py-28">
-      <div className="grid gap-10 lg:grid-cols-[1fr_1.4fr]">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
         <Reveal>
           <p className="eyebrow">{h.whyEyebrow}</p>
           <h2 className="mt-4 text-3xl font-semibold leading-tight text-[var(--text-heading)] sm:text-[2.6rem]">{h.whyTitle}</h2>
@@ -248,7 +248,7 @@ const Tools: React.FC<{ lang: Lang }> = ({ lang }) => {
   ];
   return (
     <section className="rule-top py-16 sm:py-20">
-      <div className="grid gap-10 lg:grid-cols-[1fr_1.6fr]">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)]">
         <div>
           <p className="eyebrow">{h.toolsEyebrow}</p>
           <h2 className="mt-4 text-3xl font-semibold text-[var(--text-heading)] sm:text-[2.6rem]">{h.toolsTitle}</h2>
@@ -284,7 +284,7 @@ const RightsBand: React.FC<{ lang: Lang }> = ({ lang }) => {
   return (
     <section className="py-8">
       <Reveal>
-        <div className="grid gap-8 rounded-xl bg-[var(--text-heading)] p-8 text-[var(--bg)] sm:p-12 lg:grid-cols-[1.5fr_1fr] lg:items-end">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-8 rounded-xl bg-[var(--text-heading)] p-8 text-[var(--bg)] sm:p-12 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] lg:items-end">
           <div>
             <p className="font-mono text-xs uppercase tracking-[0.14em] opacity-75">{h.rightsEyebrow}</p>
             <h2 className="mt-4 text-3xl font-semibold leading-tight sm:text-[2.6rem]">{h.rightsTitle}</h2>
@@ -312,7 +312,7 @@ const Author: React.FC<{ lang: Lang }> = ({ lang }) => {
   return (
     <section className="py-16 sm:py-20">
       <Reveal>
-        <div className="grid gap-8 lg:grid-cols-[auto_1fr] lg:gap-12">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-8 lg:grid-cols-[auto_1fr] lg:gap-12">
           <picture className="block h-28 w-28 shrink-0 overflow-hidden rounded-full border border-[var(--rule)] bg-[var(--bg-elevated)]">
             <source srcSet="./malick-ba.webp" type="image/webp" />
             <img
