@@ -1,7 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import type { Lang } from '../../i18n';
-import { LAB_STR, PASSPHRASE_WORDS } from '../../data/labs';
-import { analyzePassword, generatePassphrase, humanTime, type FindingKey } from '../../lib/password';
+import { LAB_STR } from '../../data/labs';
+import { analyzePassword, humanTime, type FindingKey } from '../../lib/password';
+import { generatePassphrase } from '../../lib/passphrase';
 import { IconAlert, IconCheck, IconEye, IconKey, IconLock } from '../icons';
 
 // Bar colours can be decorative hues; text uses theme tokens that meet 4.5:1.
@@ -80,7 +81,8 @@ export const PasswordTester: React.FC<{ lang: Lang }> = ({ lang }) => {
                 {s.levels[report.level]}
               </span>
             </div>
-            <p className="mt-2 text-xs text-[var(--text-muted)]">{s.basis}</p>
+            <p className="mt-2 text-xs text-[var(--text-muted)]">{s.bits(Math.round(report.bits), report.words)}</p>
+            <p className="mt-1 text-xs text-[var(--text-muted)]">{s.basis}</p>
 
             {report.findings.length > 0 && (
               <>
@@ -121,7 +123,7 @@ export const PasswordTester: React.FC<{ lang: Lang }> = ({ lang }) => {
           </p>
         )}
         <div className="mt-4 flex flex-wrap gap-3">
-          <button onClick={() => setPhrase(generatePassphrase(PASSPHRASE_WORDS, 5))} className="btn-primary">
+          <button onClick={() => setPhrase(generatePassphrase())} className="btn-primary">
             {s.genBtn}
           </button>
           {phrase && (

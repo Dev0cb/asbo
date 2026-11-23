@@ -2,9 +2,13 @@
 // device (no network, no storage, no analytics payload).
 //
 // Model: estimate the number of guesses an attacker needs, taking the
-// cheapest of (a) brute force over the character pool and (b) smarter
-// pattern attacks (common passwords, dictionary word + digits, sequences).
+// cheapest of several attacks: (a) brute force over the character pool,
+// (b) common passwords / word + digits, (c) a word-by-word attack that treats
+// each word as ONE symbol from a dictionary (this is how passphrases are
+// really attacked: length in letters does not matter, the number of randomly
+// chosen words does), plus sequences and repeats.
 // Crack time assumes an offline attack at 10 billion guesses per second.
+import { PASSPHRASE_SET, PASSPHRASE_WORDS, stripAccents } from './passphrase';
 
 export type Level = 0 | 1 | 2 | 3 | 4;
 
@@ -19,16 +23,35 @@ export type FindingKey =
   | 'noUpper'
   | 'noDigit'
   | 'noSymbol'
-  | 'passphrase';
+  | 'passphrase'
+  | 'dictionaryWords'
+  | 'fewWords'
+  | 'digitsAtEnd'
+  | 'personalWords';
 
 export interface PasswordReport {
   guesses: number;
   seconds: number;
+  /** log2(guesses): "bits" of real unpredictability. */
+  bits: number;
   level: Level;
   findings: FindingKey[];
+  /** Words recognised by the word-by-word attack (0 if none). */
+  words: number;
 }
 
 export const GUESSES_PER_SECOND = 1e10;
+
+/** Words of a passphrase worth recommending (≈ 66 bits with the ASBO list). */
+export const RECOMMENDED_WORDS = 6;
+
+// Size of the lists an attacker would use, per kind of word.
+const COMMON_LIST_SIZE = 1e3;
+/** French/English dictionary + first names: generous for hand-picked words. */
+const DICTIONARY_SIZE = 1e5;
+const SYMBOLS = 33;
+/** Plausible years (1930–2039) instead of 10,000 four-digit numbers. */
+const YEAR_CHOICES = 110;
 
 // Most-used passwords + words people in Senegal commonly build them from.
 const COMMON = new Set([
@@ -41,6 +64,14 @@ const COMMON = new Set([
   'moussa', 'mamadou', 'modou', 'ibrahima', 'cheikh', 'abdou', 'ousmane',
   'serigne', 'fatou', 'aminata', 'awa', 'aissatou', 'mariama', 'khady', 'ndeye',
   'astou', 'coumba', 'binta', 'mame', 'baye', 'maman', 'papa', 'football',
+  // Elsewhere in Africa, the diaspora and worldwide.
+  'abidjan', 'bamako', 'ouaga', 'ouagadougou', 'cotonou', 'lome', 'niamey', 'conakry', 'douala', 'yaounde',
+  'lagos', 'abuja', 'accra', 'kumasi', 'nairobi', 'mombasa', 'casablanca', 'rabat', 'paris', 'bruxelles', 'montreal',
+  'mtn', 'mpesa', 'momo', 'moov', 'airtel', 'opay', 'jesus', 'jesuschrist', 'blessed', 'godisgood', 'allah',
+  'mohamed', 'mohammed', 'ahmed', 'aboubacar', 'adama', 'issa', 'oumar', 'kofi', 'kwame', 'ama', 'chinedu', 'emeka',
+  'fatoumata', 'mariam', 'aicha', 'grace', 'blessing', 'precious', 'jean', 'marie', 'pierre', 'sophie', 'nicolas',
+  'password1', 'qwerty123', 'azerty123', 'abc123', 'iloveyou1', 'welcome', 'letmein', 'sunshine', 'princess',
+  'dragon', 'monkey', 'master', 'loveme', 'chelsea', 'arsenal', 'barcelona', 'realmadrid', 'liverpool',
 ]);
 
 const SEQUENCES = ['0123456789', 'abcdefghijklmnopqrstuvwxyz', 'azertyuiop', 'qwertyuiop', 'qsdfghjklm'];
@@ -56,7 +87,7 @@ function poolSize(pw: string): number {
   if (/[a-z]/.test(pw)) pool += 26;
   if (/[A-Z]/.test(pw)) pool += 26;
   if (/[0-9]/.test(pw)) pool += 10;
-  if (/[^A-Za-z0-9]/.test(pw)) pool += 33;
+  if (/[^A-Za-z0-9]/.test(pw)) pool += SYMBOLS;
   return pool;
 }
 
@@ -83,77 +114,149 @@ function wordAttackGuesses(match: RegExpExecArray, dictionarySize: number): numb
   const digits = match[2].length;
   const symbols = match[3].length;
   const capitalised = /[A-Z]/.test(match[1]) ? 4 : 1;
-  return dictionarySize * Math.pow(10, digits) * Math.pow(33, symbols) * capitalised;
+  return dictionarySize * Math.pow(10, digits) * Math.pow(SYMBOLS, symbols) * capitalised;
+}
+
+/** Looks like a real word: has a vowel, no run of 4+ consonants. */
+function isWordLike(word: string): boolean {
+  return /^[a-z]{3,14}$/.test(word) && /[aeiouy]/.test(word) && !/[^aeiouy]{4}/.test(word);
+}
+
+type WordKind = 'common' | 'list' | 'dictionary';
+
+function wordKind(word: string): WordKind | null {
+  if (COMMON.has(word)) return 'common';
+  if (PASSPHRASE_SET.has(word)) return 'list';
+  if (isWordLike(word)) return 'dictionary';
+  return null;
+}
+
+const WORD_CHOICES: Record<WordKind, number> = {
+  common: COMMON_LIST_SIZE,
+  list: PASSPHRASE_WORDS.length,
+  dictionary: DICTIONARY_SIZE,
+};
+
+/** Capitalisation variants an attacker tries for a word. */
+function caseChoices(token: string): number {
+  if (token === token.toLowerCase()) return 1;
+  const rest = token.slice(1);
+  if (rest === rest.toLowerCase() || token === token.toUpperCase()) return 2; // "Word" / "WORD"
+  return Math.pow(2, token.length); // random caps: every letter is a choice
+}
+
+interface WordAttack {
+  guesses: number;
+  words: number;
+  kinds: WordKind[];
+  digitsAtEnd: boolean;
+}
+
+/**
+ * Word-by-word attack: each recognised word is one pick from a list, each
+ * other chunk is brute-forced. Only meaningful when words were recognised.
+ */
+function wordByWordAttack(pw: string): WordAttack | null {
+  const tokens = pw.match(/\p{L}+|\d+|[^\p{L}\d]+/gu) ?? [];
+  const kinds: WordKind[] = [];
+  const seenSeparators = new Set<string>();
+  let guesses = 1;
+
+  for (const token of tokens) {
+    if (/^\p{L}+$/u.test(token)) {
+      const word = stripAccents(token).toLowerCase();
+      const kind = wordKind(word);
+      if (kind) {
+        kinds.push(kind);
+        guesses *= WORD_CHOICES[kind] * caseChoices(token);
+      } else {
+        guesses *= Math.pow(token === token.toLowerCase() ? 26 : 52, token.length);
+      }
+    } else if (/^\d+$/.test(token)) {
+      guesses *= /^(19[3-9]\d|20[0-3]\d)$/.test(token) ? YEAR_CHOICES : Math.pow(10, token.length);
+    } else if (!seenSeparators.has(token)) {
+      // Repeating the same separator costs the attacker nothing more.
+      seenSeparators.add(token);
+      guesses *= Math.pow(SYMBOLS, token.length);
+    }
+  }
+
+  if (kinds.length === 0) return null;
+  const digitsAtEnd = tokens.length >= 2 && /^\d{1,4}$/.test(tokens[tokens.length - 1]) && /\p{L}/u.test(pw);
+  return { guesses, words: kinds.length, kinds, digitsAtEnd };
 }
 
 export function analyzePassword(pw: string): PasswordReport {
   const findings: FindingKey[] = [];
-  if (!pw) return { guesses: 0, seconds: 0, level: 0, findings };
+  const add = (f: FindingKey) => {
+    if (!findings.includes(f)) findings.push(f);
+  };
+  if (!pw) return { guesses: 0, seconds: 0, bits: 0, level: 0, findings, words: 0 };
 
   const bruteForce = Math.pow(poolSize(pw), pw.length);
   let guesses = bruteForce;
 
-  // Word + optional digits/symbols suffix, e.g. "Senegal2024!", "Awa221".
+  // Word + optional digits/symbols suffix, e.g. "Senegal2024!", "Awa221", "S3n3gal".
   const wordMatch = /^([a-zA-Z@$013457]+?)(\d{0,6})([^A-Za-z0-9]{0,2})$/.exec(pw);
   const base = wordMatch ? deLeet(wordMatch[1]).replace(/[^a-z]/g, '') : '';
 
   if (COMMON.has(pw.toLowerCase()) || COMMON.has(deLeet(pw))) {
-    findings.push('common');
-    guesses = Math.min(guesses, 1e3);
+    add('common');
+    guesses = Math.min(guesses, COMMON_LIST_SIZE);
   } else if (wordMatch && COMMON.has(base)) {
-    findings.push('common', 'wordDigits');
-    guesses = Math.min(guesses, wordAttackGuesses(wordMatch, 1e3));
-  } else if (wordMatch && /[a-zA-Z]{3}/.test(wordMatch[1])) {
+    add('common');
+    add('wordDigits');
+    guesses = Math.min(guesses, wordAttackGuesses(wordMatch, COMMON_LIST_SIZE));
+  } else if (wordMatch && /[a-zA-Z]{3}/.test(wordMatch[1]) && wordMatch[2]) {
     // Unknown word + digits: attackers use dictionaries of ~1M words/names.
-    findings.push('wordDigits');
+    add('wordDigits');
     guesses = Math.min(guesses, wordAttackGuesses(wordMatch, 1e6));
   }
 
-  // Several common words glued together, e.g. "Dakar_Thies_1998".
-  const tokens = pw.split(/[^a-zA-Z]+/).filter(Boolean);
-  if (tokens.length >= 2 && tokens.every((tk) => COMMON.has(deLeet(tk)))) {
-    if (!findings.includes('common')) findings.push('common');
-    const digits = (pw.match(/\d/g) ?? []).length;
-    const symbols = (pw.match(/[^A-Za-z0-9]/g) ?? []).length;
-    guesses = Math.min(guesses, Math.pow(1e3, tokens.length) * Math.pow(10, digits) * Math.pow(33, symbols) * 4);
-  }
+  const attack = wordByWordAttack(pw);
+  if (attack) guesses = Math.min(guesses, attack.guesses);
 
   if (/^\d+$/.test(pw)) {
-    findings.push('onlyDigits');
+    add('onlyDigits');
     guesses = Math.min(guesses, Math.pow(10, pw.length));
   }
   if (hasSequence(pw)) {
-    findings.push('sequence');
+    add('sequence');
     guesses = Math.min(guesses, Math.max(1e4, bruteForce / 1e6));
   }
   if (/(.)\1{2,}/.test(pw)) {
-    findings.push('repeat');
+    add('repeat');
     guesses = Math.min(guesses, Math.max(1e4, bruteForce / 1e4));
   }
-  if (/(19[4-9]\d|20[0-3]\d)/.test(pw)) findings.push('year');
+  if (/(19[3-9]\d|20[0-3]\d)/.test(pw)) add('year');
 
-  const words = pw.trim().split(/[\s\-_.]+/).filter((w) => w.length >= 3);
-  const isPassphrase = words.length >= 4 && pw.length >= 20;
-  if (isPassphrase) findings.push('passphrase');
+  const isPassphrase = !!attack && attack.words >= 3 && pw.length >= 16;
+  if (isPassphrase) {
+    add('passphrase');
+    add('dictionaryWords');
+    if (attack.words < RECOMMENDED_WORDS) add('fewWords');
+    if (attack.kinds.includes('common')) add('personalWords');
+  } else if (attack && attack.kinds.includes('common') && attack.words >= 2) {
+    add('common');
+  }
+  if (attack?.digitsAtEnd && (isPassphrase || findings.includes('wordDigits'))) add('digitsAtEnd');
 
-  if (pw.length < 12 && !isPassphrase) findings.push('short');
+  if (pw.length < 12 && !isPassphrase) add('short');
   if (!isPassphrase) {
-    if (!/[A-Z]/.test(pw)) findings.push('noUpper');
-    if (!/[0-9]/.test(pw)) findings.push('noDigit');
-    if (!/[^A-Za-z0-9]/.test(pw)) findings.push('noSymbol');
+    if (!/[A-Z]/.test(pw)) add('noUpper');
+    if (!/[0-9]/.test(pw)) add('noDigit');
+    if (!/[^A-Za-z0-9]/.test(pw)) add('noSymbol');
   }
 
   const seconds = guesses / GUESSES_PER_SECOND;
-  return { guesses, seconds, level: levelFor(seconds), findings };
-}
-
-/** Pick `count` random words using the CSPRNG (never Math.random). */
-export function generatePassphrase(words: readonly string[], count = 4): string {
-  const picks = new Uint32Array(count + 1);
-  crypto.getRandomValues(picks);
-  const chosen = Array.from(picks.slice(0, count), (n) => words[n % words.length]);
-  const number = String(picks[count] % 100).padStart(2, '0');
-  return `${chosen.join('-')}-${number}`;
+  return {
+    guesses,
+    seconds,
+    bits: Math.log2(Math.max(1, guesses)),
+    level: levelFor(seconds),
+    findings,
+    words: attack?.words ?? 0,
+  };
 }
 
 export type TimeUnit = 'instant' | 'seconds' | 'minutes' | 'hours' | 'days' | 'months' | 'years' | 'centuries';
