@@ -91,33 +91,40 @@ const Question: React.FC<{ lang: Lang; meta: ItemMeta; value?: Answer; onChange:
   const { country } = useCountry();
   const text = ITEM_TEXT[lang][meta.id];
   const labels = ANSWER_TEXT[lang][meta.kind];
+  // Native radio group: one Tab stop per question, arrow keys move between
+  // answers, and screen readers announce "1 of 3, selected" by themselves.
   return (
-    <div>
-      <p id={`q-${meta.id}`} className="text-sm leading-relaxed text-[var(--text)]">{fillCountry(text.q, country, lang)}</p>
-      <div className="mt-2 grid grid-cols-3 gap-2" role="radiogroup" aria-labelledby={`q-${meta.id}`}>
+    <fieldset>
+      <legend className="text-sm leading-relaxed text-[var(--text)]">{fillCountry(text.q, country, lang)}</legend>
+      <div className="mt-2 grid grid-cols-3 gap-2">
         {ANSWERS.map((a, i) => {
           const selected = value === a;
           const color = ACCESS[a] === 1 ? 'var(--bad)' : ACCESS[a] > 0 ? 'var(--warn)' : 'var(--good)';
           return (
-            <button
+            <label
               key={a}
-              type="button"
-              role="radio"
-              aria-checked={selected}
-              onClick={() => onChange(a)}
-              className="min-h-11 rounded-lg border px-2 py-2 text-xs font-medium leading-tight transition-colors sm:text-sm"
+              className="flex min-h-11 cursor-pointer items-center gap-2 rounded-lg border px-2.5 py-2 text-xs font-medium leading-tight transition-colors sm:text-sm"
               style={
                 selected
                   ? { borderColor: color, color: 'var(--text-heading)', background: 'var(--bg-elevated)' }
                   : { borderColor: 'var(--border)', color: 'var(--text-muted)' }
               }
             >
+              <input
+                type="radio"
+                name={`audit-${meta.id}`}
+                value={a}
+                checked={selected}
+                onChange={() => onChange(a)}
+                className="h-4 w-4 shrink-0"
+                style={{ accentColor: selected ? color : undefined }}
+              />
               {labels[i]}
-            </button>
+            </label>
           );
         })}
       </div>
-    </div>
+    </fieldset>
   );
 };
 
